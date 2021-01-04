@@ -5,6 +5,7 @@ import Home from "./Home";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Checkout from "./Checkout";
 import Login from "./Login";
+import Payment from "./Payment";
 
 function App() {
   // fetch api here
@@ -19,20 +20,23 @@ function App() {
     // BEM
     <Router>
       <div className="App">
-
         <Switch>
           <Route path="/login">
-            <Login/>
+            <Login />
           </Route>
 
           <Route path="/checkout">
-          <Header />
+            <Header />
 
             <Checkout />
           </Route>
+          <Route path="/payment">
+            <Header />
+            <Payment />
+          </Route>
 
           <Route path="/">
-          <Header />
+            <Header />
 
             <Home />
           </Route>
