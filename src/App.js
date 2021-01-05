@@ -6,6 +6,10 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Checkout from "./Checkout";
 import Login from "./Login";
 import Payment from "./Payment";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const promise = loadStripe('pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1');
 
 function App() {
   // fetch api here
@@ -32,7 +36,9 @@ function App() {
           </Route>
           <Route path="/payment">
             <Header />
+            <Elements stripe={promise}>
             <Payment />
+            </Elements>
           </Route>
 
           <Route path="/">
