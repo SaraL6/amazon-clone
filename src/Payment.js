@@ -27,13 +27,13 @@ function Payment() {
     const getClientSecret = async () => {
       const response = await axios({
         method: "post",
-        // Stripe expects the total in a curricies subunits
-        url: `/payement/create/create?total=${getBasketTotal(basket) * 100}`,
+        // Stripe expects the total in a currencies subunits
+        url: `/payment/create?total=${getBasketTotal(basket) * 100}`,
       });
-      setClientSecret(response.data.clientSecret);
-    };
+      setClientSecret(response.data.clientSecret)
+    }
     getClientSecret();
-  }, [basket]);
+  }, [basket])
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,15 +44,19 @@ function Payment() {
         payment_method: {
           card: elements.getElement(CardElement),
         },
-      })
+      })        
+
       .then(({ paymentIntent }) => {
         // paymentIntent=payment confirmation
-
+        console.log(paymentIntent);
         setSucceeded(true);
         setError(null);
         setProcessing(false);
+     
 
         history.replace("/orders");
+      //    console.log(clientSecret);
+      // console.log(CardElement);
       });
   };
 
@@ -99,10 +103,10 @@ function Payment() {
         </div>
       </div>
 
-      {/* Payement method */}
+      {/* Payment method */}
       <div className="payment__section">
         <div className="payment__title">
-          <h3>Payement Method</h3>
+          <h3>Payment Method</h3>
         </div>
         <div className="payment__details">
           {/* stripe */}

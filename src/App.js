@@ -8,18 +8,45 @@ import Login from "./Login";
 import Payment from "./Payment";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { auth } from "./firebase";
+import { useStateValue } from "./StateProvider";
 
 const promise = loadStripe('pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1');
 
 function App() {
   // fetch api here
+  // useEffect(() => {
+  //   fetch("http://localhost:8000/api/test").then(function (response) {
+  //     response.json().then(function (resp) {
+  //       console.log(resp);
+  //     });
+  //   });
+  // });
+  const [{},dispatch] = useStateValue();
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/test").then(function (response) {
-      response.json().then(function (resp) {
-        console.log(resp);
-      });
-    });
-  });
+    // will only run once when the app componenet loads
+
+    auth.onAuthStateChanged(authUser => {
+      console.log('THE USER IS>>>',authUser);
+
+      if(authUser) {
+        // the user just logged in/the user was logged in 
+        dispatch({
+          type:'SET_USER',
+          user:authUser
+        })
+        
+      }else {
+        // the user is logged out
+        dispatch({
+          type:'SET_USER',
+          user: null
+        })
+      }
+    })
+  },[])
+
   return (
     // BEM
     <Router>
