@@ -4,7 +4,7 @@ import CheckoutProduct from "./CheckoutProduct";
 import { useStateValue } from "./StateProvider";
 import Subtotal from "./Subtotal";
 import FlipMove from 'react-flip-move';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 
 function Checkout() {

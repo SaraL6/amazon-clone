@@ -7,6 +7,7 @@ import "./Payment.css";
 import { getBasketTotal } from "./reducer";
 import { useStateValue } from "./StateProvider";
 import axios from "./axios";
+import { db } from "./firebase";
 
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
@@ -28,12 +29,14 @@ function Payment() {
       const response = await axios({
         method: "post",
         // Stripe expects the total in a currencies subunits
-        url: `/payment/create?total=${getBasketTotal(basket) * 100}`,
+        url: `/payments/create?total=${getBasketTotal(basket) * 100}`,
       });
-      setClientSecret(response.data.clientSecret)
-    }
+      setClientSecret(response.data.clientSecret);
+    };
     getClientSecret();
-  }, [basket])
+  }, [basket]);
+
+  console.log("THE SECRET IS >>>", clientSecret);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,19 +47,34 @@ function Payment() {
         payment_method: {
           card: elements.getElement(CardElement),
         },
-      })        
+      })
 
       .then(({ paymentIntent }) => {
         // paymentIntent=payment confirmation
+
+        db.collection("users")
+          .doc(user?.id)
+          .doc(user?.id)
+          .collection("orders")
+          .doc(paymentIntent.id)
+          .set({
+            basket: basket,
+            amount: paymentIntent.amount,
+            created: paymentIntent.created,
+          });
+
         console.log(paymentIntent);
         setSucceeded(true);
         setError(null);
         setProcessing(false);
-     
+
+        dispatch({
+          type: "EMPTY_BASKET",
+        });
 
         history.replace("/orders");
-      //    console.log(clientSecret);
-      // console.log(CardElement);
+        //    console.log(clientSecret);
+        // console.log(CardElement);
       });
   };
 
