@@ -54,6 +54,7 @@ function App() {
       <div className="App">
         <Switch>
           <Route path="/orders">
+          <Header />
             <Orders />
           </Route>
           <Route path="/login">
@@ -62,9 +63,9 @@ function App() {
 
           <Route path="/checkout">
             <Header />
-
             <Checkout />
           </Route>
+          
           <Route path="/payment">
             <Header />
             <Elements stripe={promise}>
