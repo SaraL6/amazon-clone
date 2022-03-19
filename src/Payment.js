@@ -24,6 +24,18 @@ function Payment() {
 
   useEffect(() => {
     // generate special stripe secret which allows us to charge a customer
+    // const getAxios = async () => {
+    //   axios.get('https://fakestoreapi.com/products')
+
+    //     .then(response => {
+    //       console.log(response)
+    //     })
+    //     .catch(error => {
+    //       console.log(error)
+    //     }
+    //     )
+    // }
+
 
     const getClientSecret = async () => {
       const response = await axios({
@@ -36,7 +48,7 @@ function Payment() {
     getClientSecret();
   }, [basket]);
 
-  console.log("THE SECRET IS >>>", clientSecret);
+  // console.log("THE SECRET IS >>>", clientSecret);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -53,7 +65,7 @@ function Payment() {
         // paymentIntent=payment confirmation
 
         db
-        .collection("users")
+          .collection("users")
           .doc(user?.uid)
           .collection("orders")
           .doc(paymentIntent.id)
@@ -63,7 +75,7 @@ function Payment() {
             created: paymentIntent.created,
           });
 
-        console.log(paymentIntent);
+        // console.log(paymentIntent);
         setSucceeded(true);
         setError(null);
         setProcessing(false);
