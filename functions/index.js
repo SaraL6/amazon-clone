@@ -46,7 +46,7 @@ exports.makeUppercase = functions.firestore.document('/messages/{documentId}')
     return snap.ref.set({ uppercase }, { merge: true });
   });
 
-exports.checkIP = functions.runWith({
+exports.getProducts = functions.runWith({
   timeoutSeconds: 300,
   memory: "1GB",
 }).https.onRequest((req, res) => {
@@ -72,6 +72,42 @@ exports.checkIP = functions.runWith({
         admin.firestore().collection('products').add({ products: data });
         return res.status(200).json({
           products: data
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        return res.status(500).json({
+          message: err
+        })
+      })
+  })
+});
+exports.getCategories = functions.runWith({
+  timeoutSeconds: 300,
+  memory: "1GB",
+}).https.onRequest((req, res) => {
+  cors(req, res, () => {
+    if (req.method !== "GET") {
+      return res.status(401).json({
+        message: "Not allowed"
+      });
+    }
+    rp({
+      uri: 'https://fakestoreapi.com/products/categories',
+      qs: {
+        format: 'json'
+      },
+      headers: {
+        'User-Agent': 'Request-Promise',
+        'Connection': 'keep-alive'
+      },
+      json: true // Automatically parses the JSON string in the response
+    })
+      .then(data => {
+        console.log(data)
+        admin.firestore().collection('categories').add({ categories: data });
+        return res.status(200).json({
+          categories: data
         })
       })
       .catch(err => {
