@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Header from "./Header";
 import Home from "./Home";
@@ -11,8 +11,11 @@ import { loadStripe } from "@stripe/stripe-js";
 import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import Orders from "./Orders";
+import { OrdersContext } from "./ordersContext";
 
-const promise = loadStripe('pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1');
+const promise = loadStripe(
+  "pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1"
+);
 
 function App() {
   // fetch api here
@@ -23,30 +26,31 @@ function App() {
   //     });
   //   });
   // });
-  const [{},dispatch] = useStateValue();
+  const [orders, setOrders] = useState([]);
+
+  const [{}, dispatch] = useStateValue();
 
   useEffect(() => {
     // will only run once when the app componenet loads
 
-    auth.onAuthStateChanged(authUser => {
+    auth.onAuthStateChanged((authUser) => {
       // console.log('THE USER IS>>>',authUser);
 
-      if(authUser) {
-        // the user just logged in/the user was logged in 
+      if (authUser) {
+        // the user just logged in/the user was logged in
         dispatch({
-          type:'SET_USER',
-          user:authUser
-        })
-        
-      }else {
+          type: "SET_USER",
+          user: authUser,
+        });
+      } else {
         // the user is logged out
         dispatch({
-          type:'SET_USER',
-          user: null
-        })
+          type: "SET_USER",
+          user: null,
+        });
       }
-    })
-  },[])
+    });
+  }, []);
 
   return (
     // BEM
@@ -54,8 +58,10 @@ function App() {
       <div className="App">
         <Switch>
           <Route path="/orders">
-          <Header />
-            <Orders />
+            <Header />
+            <OrdersContext.Provider value={{ orders, setOrders }}>
+              <Orders />
+            </OrdersContext.Provider>
           </Route>
           <Route path="/login">
             <Login />
@@ -63,14 +69,18 @@ function App() {
 
           <Route path="/checkout">
             <Header />
-            <Checkout />
+            <OrdersContext.Provider value={{ orders, setOrders }}>
+              <Checkout />
+            </OrdersContext.Provider>
           </Route>
-          
+
           <Route path="/payment">
             <Header />
-            <Elements stripe={promise}>
-            <Payment />
-            </Elements>
+            <OrdersContext.Provider value={{ orders, setOrders }}>
+              <Elements stripe={promise}>
+                <Payment />
+              </Elements>
+            </OrdersContext.Provider>
           </Route>
 
           <Route path="/">

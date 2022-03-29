@@ -1,3 +1,4 @@
+import Rating from "./Rating";
 import React from "react";
 import "./Product.css";
 import { useStateValue } from "./StateProvider";
@@ -28,15 +29,33 @@ function Product({ id, title, image, price, rating }) {
           <strong>{price}</strong>
         </p>
         <div className="product__rating">
-          {Array(rating)
+          <Rating rating={rating}></Rating>
+          {/* {Array(rating)
             .fill()
             .map((_, i) => (
               <p>🌟</p>
-            ))}
+            ))} */}
         </div>
       </div>
-      <img src={image} alt="" />
 
+      <img
+        alt=""
+        src={image}
+        onError={(e) => (
+          (e.target.onerror = null),
+          (e.target.src =
+            "https://vermeeraustralia.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png")
+        )}
+      />
+      {/* <img
+        src={
+          image != "null"
+            ? image
+            : "https://vermeeraustralia.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
+        }
+        class="img-fluid"
+        alt=""
+      /> */}
       <button onClick={addToBasket}>Add to Basket</button>
     </div>
   );

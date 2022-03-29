@@ -57,11 +57,11 @@ function Home() {
   }, [products, categories]);
   useEffect(() => {
     if (value && value.length > 0) {
-      console.log(products);
+      // console.log(products);
       var reduced = products.reduce(function (filtered, product) {
-        console.log("product.category", product.category);
-        console.log("value", value);
-        console.log(product.category === value);
+        // console.log("product.category", product.category);
+        // console.log("value", value);
+        // console.log(product.category === value);
         if (product.category === value) {
           var someNewValue = product;
 
@@ -98,7 +98,7 @@ function Home() {
               title={product.title}
               price={product.price}
               image={product.image}
-              rating={2}
+              rating={product.rating.rate}
             />
           ))}
         </div>
