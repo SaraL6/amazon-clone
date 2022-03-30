@@ -6,7 +6,6 @@ import Subtotal from "./Subtotal";
 import FlipMove from "react-flip-move";
 import { forwardRef } from "react";
 
-
 function Checkout() {
   const [{ basket, user }, dispatch] = useStateValue();
 
@@ -23,6 +22,7 @@ function Checkout() {
           <h2 className="checkout__title">Your shopping Basket</h2>
           {basket.map((item) => (
             <CheckoutProduct
+              key={item.id}
               id={item.id}
               title={item.title}
               image={item.image}

@@ -24,7 +24,16 @@ function CheckoutProduct({
 
   return (
     <div className="checkoutProduct">
-      <img className="checkoutProduct__image" src={image} alt="" />
+      <img
+        className="checkoutProduct__image"
+        src={image}
+        alt=""
+        onError={(e) => (
+          (e.target.onerror = null),
+          (e.target.src =
+            "https://vermeeraustralia.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png")
+        )}
+      />
 
       <div className="checkoutProduct__info">
         <p className="checkoutProduct__title">{title}</p>

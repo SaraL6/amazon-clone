@@ -12,24 +12,6 @@ export default function BasicRating({ rating, orderId, productId }) {
   const [value, setValue] = React.useState(0);
   const [ratingState, setRating] = useState(false);
   const { orders, setOrders } = useContext(OrdersContext);
-
-  const getRatedOrder = () => {
-    if (user) {
-      db.collection("users")
-        .doc(user?.uid)
-        .collection("orders")
-        .orderBy("created", "desc")
-        .onSnapshot((snapshot) => {
-          setOrders(
-            snapshot.docs.map((doc) => ({
-              id: doc.id,
-              data: doc.data(),
-            }))
-          );
-        });
-    }
-    console.log("getratdorders", orders);
-  };
   let ratedOrder;
   console.log("ordersbefore", orders);
   useEffect(() => {
@@ -38,9 +20,8 @@ export default function BasicRating({ rating, orderId, productId }) {
       .doc(user?.uid)
       .collection("orders")
       .doc(orderId);
-    if (user) {
-      console.log("orderafter", orders);
 
+    if (user) {
       if (ratingState) {
         db.collection("users")
           .doc(user?.uid)
@@ -49,15 +30,18 @@ export default function BasicRating({ rating, orderId, productId }) {
           .get()
           .then((doc) => {
             ratedOrder = [doc.data()];
-          //  console.log("ratedOrderbefore", ratedOrder);
+            console.log("ratedOrderbefore", ratedOrder);
             ratedOrder.forEach((orderBasket) => {
               let basketArr = orderBasket;
+
               var reduced = basketArr.basket.reduce(function (filtered, item) {
                 if (item.id === productId) {
                   item = { ...item, userRating: value };
                   var someNewValue = item;
+
                   filtered.push(someNewValue);
                 }
+
                 return filtered;
               }, []);
               //   console.log("reduced", reduced);
@@ -65,22 +49,21 @@ export default function BasicRating({ rating, orderId, productId }) {
                 const item = reduced.find(({ id }) => id === x.id);
                 return item ? item : x;
               });
-           //   console.log("result", result);
+              //  console.log(result);
               basketArr.basket = result;
-              docRef
-                .set(result[0])
-                .then(console.log("getorders", basketArr.basket));
-           //   console.log("basketArr.basket", basketArr.basket);
+              docRef.set(result[0]);
+              //   console.log("basketArr.basket", basketArr.basket);
             });
-           // console.log("ratedOrderafter", ratedOrder);
+            console.log("ratedOrderafter", ratedOrder);
+
             //console.log("orderId", orderId);
           });
         console.log("orderafter", orders);
+        setOrders();
       }
     } else {
       setOrders([]);
     }
-    console.log(orders);
   }, [value]);
 
   return (
@@ -97,7 +80,6 @@ export default function BasicRating({ rating, orderId, productId }) {
         onChange={(event, newValue) => {
           setValue(newValue);
           setRating(true);
-          getRatedOrder();
         }}
       />
     </Box>

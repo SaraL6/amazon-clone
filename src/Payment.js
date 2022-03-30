@@ -36,19 +36,23 @@ function Payment() {
     //     )
     // }
 
-
     const getClientSecret = async () => {
       const response = await axios({
         method: "post",
+
         // Stripe expects the total in a currencies subunits
-        url: `/payments/create?total=${getBasketTotal(basket) * 100}`,
+        url: `/payments/create?total=${Math.round(
+          getBasketTotal(basket) * 100
+        )}`,
       });
       setClientSecret(response.data.clientSecret);
     };
     getClientSecret();
   }, [basket]);
+  console.log("basket", getBasketTotal(basket) * 100);
+  console.log("roundedbasket", Math.round(getBasketTotal(basket) * 100));
 
-  // console.log("THE SECRET IS >>>", clientSecret);
+  console.log("THE SECRET IS >>>", clientSecret);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -64,8 +68,7 @@ function Payment() {
       .then(({ paymentIntent }) => {
         // paymentIntent=payment confirmation
 
-        db
-          .collection("users")
+        db.collection("users")
           .doc(user?.uid)
           .collection("orders")
           .doc(paymentIntent.id)
@@ -75,7 +78,7 @@ function Payment() {
             created: paymentIntent.created,
           });
 
-        // console.log(paymentIntent);
+        console.log(paymentIntent);
         setSucceeded(true);
         setError(null);
         setProcessing(false);
@@ -123,6 +126,7 @@ function Payment() {
         <div className="payment__items">
           {basket.map((item) => (
             <CheckoutProduct
+              key={item.id}
               id={item.id}
               title={item.title}
               image={item.image}
