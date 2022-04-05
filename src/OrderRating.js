@@ -6,65 +6,75 @@ import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
 import { useStateValue } from "./StateProvider";
 import { OrdersContext } from "./ordersContext";
+import { UserRatingContext } from "./UserRatingContext";
 
-export default function BasicRating({ rating, orderId, productId }) {
+export default function BasicRating({
+  rating,
+  orderId,
+  productId,
+  userRating,
+}) {
   const [{ basket, user }, dispatch] = useStateValue();
-  const [value, setValue] = React.useState(0);
+  // const { starValue, setValue } = useContext(UserRatingContext);
+  const [starValue, setValue] = useState(userRating);
   const [ratingState, setRating] = useState(false);
+  const [rated, setRated] = useState(false);
   const { orders, setOrders } = useContext(OrdersContext);
-  let ratedOrder;
-  console.log("ordersbefore", orders);
-  useEffect(() => {
-    var docRef = db
-      .collection("users")
-      .doc(user?.uid)
-      .collection("orders")
-      .doc(orderId);
+  let docRef = db
+    .collection("users")
+    .doc(user?.uid)
+    .collection("orders")
 
+    .doc(orderId);
+
+
+  const getRatedOrder = () => {
+    if (rated) {
+      console.log("first");
+      db.collection("users")
+        .doc(user?.uid)
+        .collection("orders")
+        .orderBy("created", "desc")
+        .onSnapshot((snapshot) => {
+          snapshot.docs.map((doc) => {
+            console.log("doc", doc.data());
+          });
+          // setOrders(
+          //   snapshot.docs.map((doc) => ({
+          //     id: doc.id,
+          //     data: doc.data(),
+          //   })),
+          //   console.log("orders", orders)
+          // );
+        });
+    }
+  };
+  //console.log("starValueon mount", starValue);
+  useEffect(() => {
     if (user) {
       if (ratingState) {
         db.collection("users")
           .doc(user?.uid)
           .collection("orders")
           .doc(orderId)
-          .get()
-          .then((doc) => {
-            ratedOrder = [doc.data()];
-            console.log("ratedOrderbefore", ratedOrder);
-            ratedOrder.forEach((orderBasket) => {
-              let basketArr = orderBasket;
+          .collection("basket")
+          .doc(`${productId}`)
+          .update({
+            "product.userRating": starValue,
+          })
 
-              var reduced = basketArr.basket.reduce(function (filtered, item) {
-                if (item.id === productId) {
-                  item = { ...item, userRating: value };
-                  var someNewValue = item;
-
-                  filtered.push(someNewValue);
-                }
-
-                return filtered;
-              }, []);
-              //   console.log("reduced", reduced);
-              const result = basketArr.basket.map((x) => {
-                const item = reduced.find(({ id }) => id === x.id);
-                return item ? item : x;
-              });
-              //  console.log(result);
-              basketArr.basket = result;
-              docRef.set(result[0]);
-              //   console.log("basketArr.basket", basketArr.basket);
+          .then(() => {
+            console.log("Document successfully updated!", orders);
+            setRated(true);
+            docRef.on("value", function (snapshot) {
+              console.log(snapshot.val());
             });
-            console.log("ratedOrderafter", ratedOrder);
-
-            //console.log("orderId", orderId);
           });
-        console.log("orderafter", orders);
-        setOrders();
       }
     } else {
       setOrders([]);
     }
-  }, [value]);
+  }, [starValue]);
 
   return (
     <Box
@@ -75,11 +85,12 @@ export default function BasicRating({ rating, orderId, productId }) {
       <Typography component="legend">Rate this product</Typography>
       <Rating
         name="simple-controlled"
-        value={value}
+        value={starValue}
         precision={0.5}
         onChange={(event, newValue) => {
           setValue(newValue);
           setRating(true);
+          // console.log("newValue", newValue);
         }}
       />
     </Box>

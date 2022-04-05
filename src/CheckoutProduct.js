@@ -9,11 +9,12 @@ function CheckoutProduct({
   title,
   price,
   rating,
+  userRating,
   hideButton,
   orderId,
 }) {
   const [{ basket }, dispatch] = useStateValue();
-
+  //console.log(orderId);
   const removeFromBasket = () => {
     // remove item from basket
     dispatch({
@@ -44,6 +45,7 @@ function CheckoutProduct({
         </p>
         <div className="checkoutProduct__rating">
           <OrderRating
+            userRating={userRating}
             rating={rating}
             orderId={orderId}
             productId={id}

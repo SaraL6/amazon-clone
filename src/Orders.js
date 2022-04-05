@@ -15,14 +15,23 @@ function Orders() {
         .doc(user?.uid)
         .collection("orders")
         .orderBy("created", "desc")
-        .onSnapshot((snapshot) => {
-          setOrders(
-            snapshot.docs.map((doc) => ({
-              id: doc.id,
-              data: doc.data(),
-            }))
-          );
-        });
+        .onSnapshot(
+          {
+            // Listen for document metadata changes
+            includeMetadataChanges: true,
+          },
+          (snapshot) => {
+            setOrders(
+              snapshot.docs.map((doc) => ({
+                id: doc.id,
+                data: doc.data(),
+              }))
+            );
+            // snapshot.docs.map((doc) => {
+            //   console.log(doc.data());
+            // });
+          }
+        );
     } else {
       setOrders([]);
     }
@@ -33,7 +42,10 @@ function Orders() {
       <h1>Your Orders</h1>
       <div className="orders__order">
         {orders?.map((order) => (
-          <Order order={order} key={order.id} />
+          <Order
+            order={order}
+            key={order.id}
+          />
         ))}
       </div>
     </div>

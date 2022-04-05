@@ -12,6 +12,7 @@ import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import Orders from "./Orders";
 import { OrdersContext } from "./ordersContext";
+import { UserRatingContext } from "./UserRatingContext";
 
 const promise = loadStripe(
   "pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1"
@@ -27,7 +28,8 @@ function App() {
   //   });
   // });
   const [orders, setOrders] = useState([]);
-
+  const [starValue, setValue] = useState();
+  const [products, setProducts] = useState([]);
   const [{}, dispatch] = useStateValue();
 
   useEffect(() => {
@@ -56,39 +58,37 @@ function App() {
     // BEM
     <Router>
       <div className="App">
-        <Switch>
-          <Route path="/orders">
-            <Header />
-            <OrdersContext.Provider value={{ orders, setOrders }}>
-              <Orders />
-            </OrdersContext.Provider>
-          </Route>
-          <Route path="/login">
-            <Login />
-          </Route>
+        <OrdersContext.Provider value={{ orders, setOrders }}>
+          <UserRatingContext.Provider value={{ starValue, setValue }}>
+            <Switch>
+              <Route path="/orders">
+                <Header />
+                <Orders />
+              </Route>
+              <Route path="/login">
+                <Login />
+              </Route>
 
-          <Route path="/checkout">
-            <Header />
-            <OrdersContext.Provider value={{ orders, setOrders }}>
-              <Checkout />
-            </OrdersContext.Provider>
-          </Route>
+              <Route path="/checkout">
+                <Header />
+                <Checkout />
+              </Route>
 
-          <Route path="/payment">
-            <Header />
-            <OrdersContext.Provider value={{ orders, setOrders }}>
-              <Elements stripe={promise}>
-                <Payment />
-              </Elements>
-            </OrdersContext.Provider>
-          </Route>
+              <Route path="/payment">
+                <Header />
+                <Elements stripe={promise}>
+                  <Payment />
+                </Elements>
+              </Route>
 
-          <Route path="/">
-            <Header />
+              <Route path="/">
+                <Header />
 
-            <Home />
-          </Route>
-        </Switch>
+                <Home />
+              </Route>
+            </Switch>
+          </UserRatingContext.Provider>
+        </OrdersContext.Provider>
       </div>
     </Router>
   );

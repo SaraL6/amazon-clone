@@ -23,6 +23,7 @@ function Order({ order }) {
           image={item.image}
           price={item.price}
           rating={item.rating}
+          userRating={item.userRating ? item.userRating : 0}
           hideButton
         />
       ))}

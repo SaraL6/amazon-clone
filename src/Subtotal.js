@@ -1,17 +1,17 @@
-import React from 'react'
+import React from "react";
 import "./Subtotal.css";
 import CurrencyFormat from "react-currency-format";
-import { useStateValue } from './StateProvider';
-import { getBasketTotal } from './reducer';
-import { useHistory } from 'react-router-dom';
+import { useStateValue } from "./StateProvider";
+import { getBasketTotal } from "./reducer";
+import { useHistory } from "react-router-dom";
 
 function Subtotal() {
   const history = useHistory();
   const [{ basket }, dispatch] = useStateValue();
 
-    return (
-        <div className="subtotal">
-             <CurrencyFormat
+  return (
+    <div className="subtotal">
+      <CurrencyFormat
         renderText={(value) => (
           <>
             <p>
@@ -23,14 +23,16 @@ function Subtotal() {
           </>
         )}
         decimalScale={2}
-        value={getBasketTotal(basket)} 
+        value={Math.round(getBasketTotal(basket))}
         displayType={"text"}
         thousandSeparator={true}
         prefix={"$"}
       />
-      <button onClick={e => history.push('/payment')}>Proceed to checkout</button>
-        </div>
-    );
+      <button onClick={(e) => history.push("/payment")}>
+        Proceed to checkout
+      </button>
+    </div>
+  );
 }
 
-export default Subtotal
+export default Subtotal;

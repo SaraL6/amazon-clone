@@ -8,6 +8,7 @@ import { getBasketTotal } from "./reducer";
 import { useStateValue } from "./StateProvider";
 import axios from "./axios";
 import { db } from "./firebase";
+import { writeBatch, doc } from "firebase/firestore";
 
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
@@ -21,7 +22,6 @@ function Payment() {
   const [error, setError] = useState(null);
   const [disabled, setDisabled] = useState(true);
   const [clientSecret, setClientSecret] = useState(true);
-
   useEffect(() => {
     // generate special stripe secret which allows us to charge a customer
     // const getAxios = async () => {
@@ -49,13 +49,13 @@ function Payment() {
     };
     getClientSecret();
   }, [basket]);
-  console.log("basket", getBasketTotal(basket) * 100);
-  console.log("roundedbasket", Math.round(getBasketTotal(basket) * 100));
 
-  console.log("THE SECRET IS >>>", clientSecret);
+  //console.log("THE SECRET IS >>>", clientSecret);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    var batch = db.batch();
+
     setProcessing(true);
 
     const payload = await stripe
@@ -77,8 +77,35 @@ function Payment() {
             amount: paymentIntent.amount,
             created: paymentIntent.created,
           });
+        basket.forEach((product) => {
+          const basketProductRef = db
+            .collection("users")
+            .doc(user?.uid)
+            .collection("orders")
+            .doc(paymentIntent.id)
+            .collection("basket")
+            .doc(`${product.id}`);
 
-        console.log(paymentIntent);
+          batch.set(basketProductRef, { product: product });
+
+          // db.collection("users")
+          //   .doc(user?.uid)
+          //   .collection("orders")
+          //   .doc(paymentIntent.id)
+          //   .collection("basket")
+          //   .doc(`${product.id}`)
+          //   .set({ product: product });
+        });
+        batch
+          .commit()
+          .then((response) => {
+            console.log("Success");
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+
+        // console.log(paymentIntent);
         setSucceeded(true);
         setError(null);
         setProcessing(false);
@@ -132,6 +159,7 @@ function Payment() {
               image={item.image}
               price={item.price}
               rating={item.rating}
+              userRating={item.userRating ? item.userRating : 0}
             />
           ))}
         </div>
@@ -150,7 +178,7 @@ function Payment() {
               <CurrencyFormat
                 renderText={(value) => <h3>Order Total: {value}</h3>}
                 decimalScale={2}
-                value={getBasketTotal(basket)}
+                value={Math.round(getBasketTotal(basket))}
                 displayType={"text"}
                 thousandSeparator={true}
                 prefix={"$"}
