@@ -1,52 +1,81 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import firebase from "firebase";
 import { db } from "./firebase";
 import "./Orders.css";
 import { useStateValue } from "./StateProvider";
 import Order from "./Order";
 import { OrdersContext } from "./ordersContext";
+import { OrderIdContext } from "./OrderIdContext";
 function Orders() {
   const [{ basket, user }, dispatch] = useStateValue();
 
   const { orders, setOrders } = useContext(OrdersContext);
-  console.log(orders);
+  const { basketOrderId, setbasketOrderId } = useContext(OrderIdContext);
+  let usersRef = db.collection("users");
+
+  let products = [];
+  const newDataRef = useRef(null);
+  let orderArr;
   useEffect(() => {
     if (user) {
-      db.collection("users")
-        .doc(user?.uid)
-        .collection("orders")
-        .orderBy("created", "desc")
-        .onSnapshot(
-          {
-            // Listen for document metadata changes
-            includeMetadataChanges: true,
-          },
-          (snapshot) => {
-            setOrders(
-              snapshot.docs.map((doc) => ({
-                id: doc.id,
-                data: doc.data(),
-              }))
-            );
-            // snapshot.docs.map((doc) => {
-            //   console.log(doc.data());
-            // });
-          }
-        );
+      db.collectionGroup("basket")
+        .where("userId", "==", user?.uid)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.docs.forEach((doc) => {
+            products.push(doc.data());
+          });
+          //console.log("products", products);
+          let newData = newDataRef.current;
+          newData = products.reduce((obj, item) => {
+            if (obj[item.orderId]) {
+              obj[item.orderId].products.push(item.products);
+            } else {
+              item.products = [item.products];
+              obj[item.orderId] = {
+                ...item,
+              };
+            }
+            return obj;
+          }, {});
+
+
+          //console.log("newdata", newData);
+
+          orderArr = Object.values(newData);
+         // console.log(orderArr)
+          const arrayOfObj = Object.entries(newData).map((e) => ({
+            [e[0]]: e[1],
+          }));
+
+          //   console.log("orderArr", orderArr);
+          //  console.log("entries", arrayOfObj);
+          setOrders(
+            orderArr.map((order) => ({
+              ...order,
+            }))
+          );
+         // console.log("orders", orders);
+        });
     } else {
       setOrders([]);
     }
   }, [user]);
 
+  useEffect(() => {
+     console.log("orders", orders);
+
+    // orders.map((order) => {
+    //    console.log("order", order);
+    // });
+  }, [orders, newDataRef]);
   return (
     <div className="orders">
       <h1>Your Orders</h1>
       <div className="orders__order">
-        {orders?.map((order) => (
-          <Order
-            order={order}
-            key={order.id}
-          />
-        ))}
+        {orders?.map((order) => {
+          return <Order order={order} />;
+        })}
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import Orders from "./Orders";
 import { OrdersContext } from "./ordersContext";
-import { UserRatingContext } from "./UserRatingContext";
+import { OrderIdContext } from "./OrderIdContext";
 
 const promise = loadStripe(
   "pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1"
@@ -28,8 +28,7 @@ function App() {
   //   });
   // });
   const [orders, setOrders] = useState([]);
-  const [starValue, setValue] = useState();
-  const [products, setProducts] = useState([]);
+  const [basketOrderId, setbasketOrderId] = useState();
   const [{}, dispatch] = useStateValue();
 
   useEffect(() => {
@@ -59,7 +58,7 @@ function App() {
     <Router>
       <div className="App">
         <OrdersContext.Provider value={{ orders, setOrders }}>
-          <UserRatingContext.Provider value={{ starValue, setValue }}>
+          <OrderIdContext.Provider value={{ basketOrderId, setbasketOrderId }}>
             <Switch>
               <Route path="/orders">
                 <Header />
@@ -87,7 +86,7 @@ function App() {
                 <Home />
               </Route>
             </Switch>
-          </UserRatingContext.Provider>
+          </OrderIdContext.Provider>
         </OrdersContext.Provider>
       </div>
     </Router>

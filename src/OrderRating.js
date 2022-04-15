@@ -1,4 +1,6 @@
 import * as React from "react";
+import firebase from "firebase";
+import "firebase/auth";
 import { useState, useEffect, useContext } from "react";
 import { db } from "./firebase";
 import Box from "@mui/material/Box";
@@ -7,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import { useStateValue } from "./StateProvider";
 import { OrdersContext } from "./ordersContext";
 import { UserRatingContext } from "./UserRatingContext";
+import { OrderIdContext } from "./OrderIdContext";
 
 export default function BasicRating({
   rating,
@@ -14,6 +17,8 @@ export default function BasicRating({
   productId,
   userRating,
 }) {
+  //console.log("userRating", userRating);
+
   const [{ basket, user }, dispatch] = useStateValue();
   // const { starValue, setValue } = useContext(UserRatingContext);
   const [starValue, setValue] = useState(userRating);
@@ -24,51 +29,53 @@ export default function BasicRating({
     .collection("users")
     .doc(user?.uid)
     .collection("orders")
+    .doc(orderId)
+    .collection("basket")
+    .doc(`${productId}`);
 
-    .doc(orderId);
-
+  let ordersBasketRef = db
+    .collection("users")
+    .doc(user?.uid)
+    .collection("orders")
+    .orderBy("created", "desc");
 
   const getRatedOrder = () => {
-    if (rated) {
-      console.log("first");
-      db.collection("users")
-        .doc(user?.uid)
-        .collection("orders")
-        .orderBy("created", "desc")
-        .onSnapshot((snapshot) => {
-          snapshot.docs.map((doc) => {
-            console.log("doc", doc.data());
-          });
-          // setOrders(
-          //   snapshot.docs.map((doc) => ({
-          //     id: doc.id,
-          //     data: doc.data(),
-          //   })),
-          //   console.log("orders", orders)
-          // );
-        });
-    }
+    db.collection("users")
+      .doc(user?.uid)
+      .collection("orders")
+      .doc("pi_3KksyTEnWfTQeFEg0JZWYZZP")
+      .onSnapshot((querySnapshot) => {
+        // querySnapshot.docs.map((doc) => {
+        //   console.log("doc", doc.data());
+        // });
+        // console.log("fdsf", querySnapshot.data());
+        // setOrders(
+        //   querySnapshot.docs.map((doc) => ({
+        //     id: doc.id,
+        //     data: doc.data(),
+        //   }))
+        // );
+      });
   };
-  //console.log("starValueon mount", starValue);
+  // getRatedOrder();
   useEffect(() => {
+   // console.log(starValue);
     if (user) {
       if (ratingState) {
-        db.collection("users")
-          .doc(user?.uid)
-          .collection("orders")
-          .doc(orderId)
-          .collection("basket")
-          .doc(`${productId}`)
+        docRef
           .update({
             "product.userRating": starValue,
+            "product.price": 5,
           })
 
           .then(() => {
-            console.log("Document successfully updated!", orders);
-            setRated(true);
-            docRef.on("value", function (snapshot) {
-              console.log(snapshot.val());
+            console.log(user?.uid, orderId, productId);
+            docRef.get().then((doc) => {
+             // console.log("updated", doc.data().product);
+              setValue(doc.data().product.userRating);
+              //  getRatedOrder();
             });
+            //  console.log("Document successfully updated!", orders);
           });
       }
     } else {

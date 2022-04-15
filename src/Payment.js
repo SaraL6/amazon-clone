@@ -73,7 +73,6 @@ function Payment() {
           .collection("orders")
           .doc(paymentIntent.id)
           .set({
-            basket: basket,
             amount: paymentIntent.amount,
             created: paymentIntent.created,
           });
@@ -86,7 +85,13 @@ function Payment() {
             .collection("basket")
             .doc(`${product.id}`);
 
-          batch.set(basketProductRef, { product: product });
+          batch.set(basketProductRef, {
+            products: product,
+            userId: user?.uid,
+            orderId: paymentIntent.id,
+            orderTotal: paymentIntent.amount,
+            created: paymentIntent.created,
+          });
 
           // db.collection("users")
           //   .doc(user?.uid)
