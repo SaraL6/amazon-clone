@@ -43,11 +43,10 @@ export default function BasicRating({
     db.collection("users")
       .doc(user?.uid)
       .collection("orders")
-      .doc("pi_3KksyTEnWfTQeFEg0JZWYZZP")
       .onSnapshot((querySnapshot) => {
-        // querySnapshot.docs.map((doc) => {
-        //   console.log("doc", doc.data());
-        // });
+        querySnapshot.docs.map((doc) => {
+          console.log("doc", doc.data());
+        });
         // console.log("fdsf", querySnapshot.data());
         // setOrders(
         //   querySnapshot.docs.map((doc) => ({
@@ -59,23 +58,22 @@ export default function BasicRating({
   };
   // getRatedOrder();
   useEffect(() => {
-   // console.log(starValue);
+    console.log(starValue);
     if (user) {
       if (ratingState) {
         docRef
           .update({
-            "product.userRating": starValue,
-            "product.price": 5,
+            "products.userRating": starValue,
           })
 
           .then(() => {
             console.log(user?.uid, orderId, productId);
-            docRef.get().then((doc) => {
-             // console.log("updated", doc.data().product);
-              setValue(doc.data().product.userRating);
-              //  getRatedOrder();
-            });
-            //  console.log("Document successfully updated!", orders);
+            // docRef.get().then((doc) => {
+            //   console.log("updated", doc.data());
+            //   // setValue(doc.data().products.userRating);
+            //   // getRatedOrder();
+            // });
+            console.log("Document successfully updated!", orders);
           });
       }
     } else {
