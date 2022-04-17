@@ -8,8 +8,6 @@ import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
 import { useStateValue } from "./StateProvider";
 import { OrdersContext } from "./ordersContext";
-import { UserRatingContext } from "./UserRatingContext";
-import { OrderIdContext } from "./OrderIdContext";
 
 export default function BasicRating({
   rating,
@@ -17,13 +15,10 @@ export default function BasicRating({
   productId,
   userRating,
 }) {
-  //console.log("userRating", userRating);
-
   const [{ basket, user }, dispatch] = useStateValue();
   // const { starValue, setValue } = useContext(UserRatingContext);
   const [starValue, setValue] = useState(userRating);
   const [ratingState, setRating] = useState(false);
-  const [rated, setRated] = useState(false);
   const { orders, setOrders } = useContext(OrdersContext);
   let docRef = db
     .collection("users")
@@ -33,32 +28,9 @@ export default function BasicRating({
     .collection("basket")
     .doc(`${productId}`);
 
-  let ordersBasketRef = db
-    .collection("users")
-    .doc(user?.uid)
-    .collection("orders")
-    .orderBy("created", "desc");
+  let ratingRef = db.collectionGroup("basket").where("userId", "==", user?.uid);
 
-  const getRatedOrder = () => {
-    db.collection("users")
-      .doc(user?.uid)
-      .collection("orders")
-      .onSnapshot((querySnapshot) => {
-        querySnapshot.docs.map((doc) => {
-          console.log("doc", doc.data());
-        });
-        // console.log("fdsf", querySnapshot.data());
-        // setOrders(
-        //   querySnapshot.docs.map((doc) => ({
-        //     id: doc.id,
-        //     data: doc.data(),
-        //   }))
-        // );
-      });
-  };
-  // getRatedOrder();
   useEffect(() => {
-    console.log(starValue);
     if (user) {
       if (ratingState) {
         docRef
@@ -68,12 +40,14 @@ export default function BasicRating({
 
           .then(() => {
             console.log(user?.uid, orderId, productId);
-            // docRef.get().then((doc) => {
-            //   console.log("updated", doc.data());
-            //   // setValue(doc.data().products.userRating);
-            //   // getRatedOrder();
-            // });
-            console.log("Document successfully updated!", orders);
+            ratingRef.get().then((doc) => {
+              doc.docs.map((ref) => {
+                console.log("ratingRef", ref);
+              });
+              // setValue(doc.data().products.userRating);
+              // getRatedOrder();
+            });
+            // console.log("Document successfully updated!", orders);
           });
       }
     } else {

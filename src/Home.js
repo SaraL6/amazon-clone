@@ -15,6 +15,7 @@ function Home() {
   const [unfilteredProducts, setunfilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [value, setCategoryValue] = React.useState();
+  let productsArr = [];
 
   const onChangeCategory = (newValue) => {
     setCategoryValue(newValue);
@@ -24,6 +25,8 @@ function Home() {
   async function seederHandler() {
     const response = await fetch(productSeederURL);
     const data = await response.json();
+    console.log("seederdata", data);
+
     categoryHandler();
   }
 
@@ -33,13 +36,18 @@ function Home() {
   }
 
   useEffect(() => {
+    console.log("productsArr", productsArr);
+    console.log("products", products);
     if (products.length === 0) {
-      db.collection("products").onSnapshot((snapshot) =>
-        snapshot.docs.map((doc) => {
-          setProducts(doc.data().products);
-          setunfilteredProducts(doc.data().products);
-        })
-      );
+      db.collection("products")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.docs.forEach((doc) => {
+            productsArr.push(doc.data());
+            setProducts(productsArr);
+            setunfilteredProducts(productsArr);
+          });
+        });
     }
     if (categories.length === 0) {
       db.collection("categories").onSnapshot((snapshot) =>
@@ -49,12 +57,9 @@ function Home() {
         })
       );
     }
-
-    // console.log("useEffectproducts", products);
-
-    //console.log("useEffectcategories", categories);
-    //console.log("useEffectvalue", value);
   }, [products, categories]);
+
+  useEffect(() => {}, [productsArr]);
   useEffect(() => {
     if (value && value.length > 0) {
       // console.log(products);

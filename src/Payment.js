@@ -92,14 +92,6 @@ function Payment() {
             orderTotal: paymentIntent.amount,
             created: paymentIntent.created,
           });
-
-          // db.collection("users")
-          //   .doc(user?.uid)
-          //   .collection("orders")
-          //   .doc(paymentIntent.id)
-          //   .collection("basket")
-          //   .doc(`${product.id}`)
-          //   .set({ product: product });
         });
         batch
           .commit()

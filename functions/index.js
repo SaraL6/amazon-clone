@@ -19,6 +19,7 @@ admin.initializeApp();
 app.use(cors);
 app.use(express.json());
 
+var batch = admin.firestore().batch();
 
 // - API routes
 app.get("/", (request, response) => response.status(200).send("Hello World"));
@@ -48,10 +49,30 @@ exports.getProducts = functions
       })
         .then((data) => {
           console.log(data);
-          admin.firestore().collection("products").add({ products: data });
-          return res.status(200).json({
-            products: data,
+          let dataArr = Object.values(data);
+          var batch = admin.firestore().batch();
+        
+          dataArr.forEach((element) => {
+                // batch.set(docRef, { element });
+                const docRef = admin
+                .firestore()
+                .collection("products")
+                .doc(`${element.id}`)
+                
+                docRef.set(element)
           });
+          // batch
+          //   .commit()
+          //   .then((response) => {
+          //     console.log("Success");
+          //   })
+          //   .catch((err) => {
+          //     console.error(err);
+          //   });
+          return res.status(200).json({
+            dataArr,
+          });
+       
         })
         .catch((err) => {
           console.log(err);
