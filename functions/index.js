@@ -59,7 +59,8 @@ exports.getProducts = functions
                 .collection("products")
                 .doc(`${element.id}`)
                 
-                docRef.set(element)
+                docRef.set({element})
+                
           });
           // batch
           //   .commit()

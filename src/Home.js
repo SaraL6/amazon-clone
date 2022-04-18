@@ -36,8 +36,8 @@ function Home() {
   }
 
   useEffect(() => {
-    console.log("productsArr", productsArr);
-    console.log("products", products);
+    //console.log("productsArr", productsArr);
+    //console.log("products", products);
     if (products.length === 0) {
       db.collection("products")
         .get()

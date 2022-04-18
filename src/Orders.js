@@ -20,6 +20,7 @@ function Orders() {
     if (user) {
       db.collectionGroup("basket")
         .where("userId", "==", user?.uid)
+        .orderBy("created", "desc")
         .get()
         .then((querySnapshot) => {
           querySnapshot.docs.forEach((doc) => {
@@ -39,11 +40,10 @@ function Orders() {
             return obj;
           }, {});
 
-
           //console.log("newdata", newData);
 
           orderArr = Object.values(newData);
-         // console.log(orderArr)
+          // console.log(orderArr)
           const arrayOfObj = Object.entries(newData).map((e) => ({
             [e[0]]: e[1],
           }));
@@ -55,7 +55,7 @@ function Orders() {
               ...order,
             }))
           );
-         // console.log("orders", orders);
+          // console.log("orders", orders);
         });
     } else {
       setOrders([]);
@@ -63,7 +63,7 @@ function Orders() {
   }, [user]);
 
   useEffect(() => {
-     console.log("orders", orders);
+    console.log("orders", orders);
 
     // orders.map((order) => {
     //    console.log("order", order);
