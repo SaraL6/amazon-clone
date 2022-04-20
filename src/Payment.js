@@ -155,7 +155,7 @@ function Payment() {
               title={item.title}
               image={item.image}
               price={item.price}
-              rating={item.rating}
+             // rating={item.rating}
               userRating={item.userRating ? item.userRating : 0}
             />
           ))}

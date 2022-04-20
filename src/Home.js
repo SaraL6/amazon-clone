@@ -39,7 +39,7 @@ function Home() {
   }
 
   useEffect(() => {
-   // console.log("products", productsArr);
+    // console.log("products", productsArr);
     if (products.length === 0) {
       db.collection("products")
         .get()
@@ -104,7 +104,7 @@ function Home() {
                 title={product.title}
                 price={product.price}
                 image={product.image}
-                rating={product.rating.rate}
+                rating={2}
               />
             );
           })}

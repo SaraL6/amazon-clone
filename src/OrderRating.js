@@ -40,14 +40,19 @@ export default function BasicRating({
 
           .then(() => {
             productRatings.get().then((doc) => {
-              console.log("productsRatings", doc.data());
-              // doc.docs.map((ref) => {
-              //   console.log("productsRatings", ref.data());
-              // });
-              // setValue(doc.data().products.userRating);
-              // getRatedOrder();
+              if (doc.data()["ratings"]) {
+                productRatings
+                  .collection("ratings")
+                  .doc(user?.uid)
+                  .update({ rating: starValue });
+              } else {
+                productRatings
+                  .collection("ratings")
+                  .doc(user?.uid)
+                  .set({ userId: user?.uid, rating: starValue });
+              }
+        
             });
-            // console.log("Document successfully updated!", orders);
           });
       }
     } else {

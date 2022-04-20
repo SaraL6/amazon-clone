@@ -57,6 +57,7 @@ exports.getProducts = functions
               .firestore()
               .collection("products")
               .doc(`${product.id}`);
+
             const allowedParams = [
               "category",
               "description",
@@ -76,7 +77,6 @@ exports.getProducts = functions
               }, {});
 
             batch.set(docRef, { ...filtered });
-
             // docRef.set(element)
           });
           batch
