@@ -51,29 +51,45 @@ exports.getProducts = functions
           console.log(data);
           let dataArr = Object.values(data);
           var batch = admin.firestore().batch();
-        
-          dataArr.forEach((element) => {
-                // batch.set(docRef, { element });
-                const docRef = admin
-                .firestore()
-                .collection("products")
-                .doc(`${element.id}`)
-                
-                docRef.set({element})
-                
+
+          dataArr.forEach((product) => {
+            const docRef = admin
+              .firestore()
+              .collection("products")
+              .doc(`${product.id}`);
+            const allowedParams = [
+              "category",
+              "description",
+              "id",
+              "image",
+              "price",
+              "title",
+            ];
+
+            const filtered = Object.keys(product)
+              .filter((key) => allowedParams.includes(key))
+              .reduce((obj, key) => {
+                return {
+                  ...obj,
+                  [key]: product[key],
+                };
+              }, {});
+
+            batch.set(docRef, { ...filtered });
+
+            // docRef.set(element)
           });
-          // batch
-          //   .commit()
-          //   .then((response) => {
-          //     console.log("Success");
-          //   })
-          //   .catch((err) => {
-          //     console.error(err);
-          //   });
+          batch
+            .commit()
+            .then((response) => {
+              console.log("Success");
+            })
+            .catch((err) => {
+              console.error(err);
+            });
           return res.status(200).json({
             dataArr,
           });
-       
         })
         .catch((err) => {
           console.log(err);

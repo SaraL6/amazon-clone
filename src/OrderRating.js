@@ -29,7 +29,7 @@ export default function BasicRating({
     .doc(`${productId}`);
 
   let ratingRef = db.collectionGroup("basket").where("userId", "==", user?.uid);
-
+  let productRatings = db.collection("products").doc(`${productId}`);
   useEffect(() => {
     if (user) {
       if (ratingState) {
@@ -39,11 +39,11 @@ export default function BasicRating({
           })
 
           .then(() => {
-            console.log(user?.uid, orderId, productId);
-            ratingRef.get().then((doc) => {
-              doc.docs.map((ref) => {
-                console.log("ratingRef", ref);
-              });
+            productRatings.get().then((doc) => {
+              console.log("productsRatings", doc.data());
+              // doc.docs.map((ref) => {
+              //   console.log("productsRatings", ref.data());
+              // });
               // setValue(doc.data().products.userRating);
               // getRatedOrder();
             });

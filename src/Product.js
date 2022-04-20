@@ -5,7 +5,7 @@ import { useStateValue } from "./StateProvider";
 
 function Product({ id, title, image, price, rating }) {
   const [{ basket, user }, dispatch] = useStateValue();
-
+ // console.log("product", id);
   const addToBasket = () => {
     // dispatch the item into the
     dispatch({
@@ -30,11 +30,6 @@ function Product({ id, title, image, price, rating }) {
         </p>
         <div className="product__rating">
           <Rating rating={rating}></Rating>
-          {/* {Array(rating)
-            .fill()
-            .map((_, i) => (
-              <p>🌟</p>
-            ))} */}
         </div>
       </div>
 
@@ -47,15 +42,6 @@ function Product({ id, title, image, price, rating }) {
             "https://vermeeraustralia.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png")
         )}
       />
-      {/* <img
-        src={
-          image != "null"
-            ? image
-            : "https://vermeeraustralia.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png"
-        }
-        class="img-fluid"
-        alt=""
-      /> */}
       <button onClick={addToBasket}>Add to Basket</button>
     </div>
   );

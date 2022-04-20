@@ -25,8 +25,11 @@ function Home() {
   async function seederHandler() {
     const response = await fetch(productSeederURL);
     const data = await response.json();
-    console.log("seederdata", data);
+    productsArr = data.dataArr;
 
+    console.log("data", data.dataArr);
+    setProducts(productsArr);
+    setunfilteredProducts(productsArr);
     categoryHandler();
   }
 
@@ -36,13 +39,13 @@ function Home() {
   }
 
   useEffect(() => {
-    //console.log("productsArr", productsArr);
-    //console.log("products", products);
+   // console.log("products", productsArr);
     if (products.length === 0) {
       db.collection("products")
         .get()
         .then((querySnapshot) => {
           querySnapshot.docs.forEach((doc) => {
+            // console.log("first", doc.data());
             productsArr.push(doc.data());
             setProducts(productsArr);
             setunfilteredProducts(productsArr);
@@ -59,14 +62,13 @@ function Home() {
     }
   }, [products, categories]);
 
-  useEffect(() => {}, [productsArr]);
+  useEffect(() => {
+    // console.log("productsArr", productsArr);
+  }, [products]);
   useEffect(() => {
     if (value && value.length > 0) {
       // console.log(products);
       var reduced = products.reduce(function (filtered, product) {
-        // console.log("product.category", product.category);
-        // console.log("value", value);
-        // console.log(product.category === value);
         if (product.category === value) {
           var someNewValue = product;
 
@@ -77,8 +79,6 @@ function Home() {
       }, []);
       setProducts(reduced);
     }
-    // console.log("useEffectvalue", value);
-    // console.log("reduced", reduced);
   }, [value]);
 
   return (
@@ -96,16 +96,18 @@ function Home() {
         ></CategoryFilter>
 
         <div className="home__row">
-          {products?.map((product) => (
-            <Product
-              key={product.id}
-              id={product.id}
-              title={product.title}
-              price={product.price}
-              image={product.image}
-              rating={product.rating.rate}
-            />
-          ))}
+          {products?.map((product) => {
+            return (
+              <Product
+                key={product.id}
+                id={product.id}
+                title={product.title}
+                price={product.price}
+                image={product.image}
+                rating={product.rating.rate}
+              />
+            );
+          })}
         </div>
         <div className="home__row"></div>
         <div className="home__row">
