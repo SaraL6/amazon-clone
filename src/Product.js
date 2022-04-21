@@ -1,11 +1,49 @@
-import Rating from "./Rating";
+import HomeRating from "./HomeRating";
 import React from "react";
 import "./Product.css";
 import { useStateValue } from "./StateProvider";
-
-function Product({ id, title, image, price, rating }) {
+import { useState, useEffect } from "react";
+import { db } from "./firebase";
+function Product({ id, title, image, price }) {
   const [{ basket, user }, dispatch] = useStateValue();
-  // console.log("product", id);
+  const [rating, setRating] = useState();
+  let ratingsArr = [];
+  let done = false;
+
+  async function getRatings() {
+    await db
+      .collectionGroup("ratings")
+      .where("productId", "==", id)
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          ratingsArr.push(doc.data().rating);
+        });
+      });
+    return ratingsArr;
+  }
+  async function getAverage() {
+    const ratings = await getRatings();
+    console.log("ratings", ratings);
+
+    var total = 0;
+    for (var i = 0; i < ratings.length; i++) {
+      total += ratings[i];
+    }
+    var avg = total / ratings.length;
+    done = true;
+    setRating(avg);
+    return avg;
+  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getAverage();
+     // console.log("data", data);
+      setRating(data);
+    };
+    fetchData();
+  }, [done]);
+
   const addToBasket = () => {
     // dispatch the item into the
     dispatch({
@@ -29,7 +67,7 @@ function Product({ id, title, image, price, rating }) {
           <strong>{price}</strong>
         </p>
         <div className="product__rating">
-          <Rating rating={rating}></Rating>
+          <HomeRating rating={rating}></HomeRating>
         </div>
       </div>
 

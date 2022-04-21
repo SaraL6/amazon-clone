@@ -38,20 +38,48 @@ function Home() {
     const data = await response.json();
   }
 
-  useEffect(() => {
-    // console.log("products", productsArr);
-    if (products.length === 0) {
+  async function getProducts() {
+    console.log(products?.length);
+    if (products?.length === 0) {
       db.collection("products")
         .get()
         .then((querySnapshot) => {
-          querySnapshot.docs.forEach((doc) => {
-            // console.log("first", doc.data());
-            productsArr.push(doc.data());
-            setProducts(productsArr);
-            setunfilteredProducts(productsArr);
-          });
+          return Promise.all(
+            querySnapshot.docs.map((doc) => {
+              //  console.log("first", doc.data());
+              productsArr.push(doc.data());
+            })
+          );
+        })
+        .catch(function (err) {
+          console.log(err.message);
         });
     }
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (products?.length === 0) {
+        const newData = await db
+          .collection("products")
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.docs.map((doc) => {
+              //  console.log("first", doc.data());
+              productsArr.push(doc.data());
+            });
+          })
+          .catch(function (err) {
+            console.log(err.message);
+          });
+        Promise.all(productsArr).then((content) => {
+          setProducts(content);
+          setunfilteredProducts(content);
+        });
+      }
+    };
+    fetchData();
+
     if (categories.length === 0) {
       db.collection("categories").onSnapshot((snapshot) =>
         snapshot.docs.map((doc) => {
@@ -61,10 +89,10 @@ function Home() {
       );
     }
   }, [products, categories]);
-
   useEffect(() => {
-    // console.log("productsArr", productsArr);
-  }, [products]);
+    console.log("object", products);
+  }, []);
+
   useEffect(() => {
     if (value && value.length > 0) {
       // console.log(products);
@@ -104,7 +132,6 @@ function Home() {
                 title={product.title}
                 price={product.price}
                 image={product.image}
-                rating={2}
               />
             );
           })}

@@ -26,7 +26,6 @@ function Orders() {
           querySnapshot.docs.forEach((doc) => {
             products.push(doc.data());
           });
-          //console.log("products", products);
           let newData = newDataRef.current;
           newData = products.reduce((obj, item) => {
             if (obj[item.orderId]) {
@@ -40,7 +39,6 @@ function Orders() {
             return obj;
           }, {});
 
-          //console.log("newdata", newData);
 
           orderArr = Object.values(newData);
           // console.log(orderArr)
@@ -48,8 +46,7 @@ function Orders() {
             [e[0]]: e[1],
           }));
 
-          //   console.log("orderArr", orderArr);
-          //  console.log("entries", arrayOfObj);
+        
           setOrders(
             orderArr.map((order) => ({
               ...order,

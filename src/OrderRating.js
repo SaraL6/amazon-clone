@@ -28,7 +28,6 @@ export default function BasicRating({
     .collection("basket")
     .doc(`${productId}`);
 
-  let ratingRef = db.collectionGroup("basket").where("userId", "==", user?.uid);
   let productRatings = db.collection("products").doc(`${productId}`);
   useEffect(() => {
     if (user) {
@@ -49,9 +48,12 @@ export default function BasicRating({
                 productRatings
                   .collection("ratings")
                   .doc(user?.uid)
-                  .set({ userId: user?.uid, rating: starValue });
+                  .set({
+                    userId: user?.uid,
+                    rating: starValue,
+                    productId: productId,
+                  });
               }
-        
             });
           });
       }
