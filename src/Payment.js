@@ -23,19 +23,6 @@ function Payment() {
   const [disabled, setDisabled] = useState(true);
   const [clientSecret, setClientSecret] = useState(true);
   useEffect(() => {
-    // generate special stripe secret which allows us to charge a customer
-    // const getAxios = async () => {
-    //   axios.get('https://fakestoreapi.com/products')
-
-    //     .then(response => {
-    //       console.log(response)
-    //     })
-    //     .catch(error => {
-    //       console.log(error)
-    //     }
-    //     )
-    // }
-
     const getClientSecret = async () => {
       const response = await axios({
         method: "post",
@@ -71,26 +58,25 @@ function Payment() {
         db.collection("users")
           .doc(user?.uid)
           .collection("orders")
-          .doc(paymentIntent.id)
+          .doc(paymentIntent?.id)
           .set({
-            amount: paymentIntent.amount,
-            created: paymentIntent.created,
+            amount: paymentIntent?.amount,
+            created: paymentIntent?.created,
           });
-        basket.forEach((product) => {
+        basket?.map((product) => {
           const basketProductRef = db
             .collection("users")
             .doc(user?.uid)
             .collection("orders")
-            .doc(paymentIntent.id)
+            .doc(paymentIntent?.id)
             .collection("basket")
-            .doc(`${product.id}`);
-
+            .doc(`${product?.id}`);
           batch.set(basketProductRef, {
             products: product,
             userId: user?.uid,
-            orderId: paymentIntent.id,
-            orderTotal: paymentIntent.amount,
-            created: paymentIntent.created,
+            orderId: paymentIntent?.id,
+            orderTotal: paymentIntent?.amount,
+            created: paymentIntent?.created,
           });
         });
         batch
@@ -155,7 +141,7 @@ function Payment() {
               title={item.title}
               image={item.image}
               price={item.price}
-             // rating={item.rating}
+              // rating={item.rating}
               userRating={item.userRating ? item.userRating : 0}
             />
           ))}

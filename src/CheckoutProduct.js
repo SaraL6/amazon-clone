@@ -46,7 +46,7 @@ function CheckoutProduct({
         <div className="checkoutProduct__rating">
           <OrderRating
             userRating={userRating}
-           // rating={rating}
+            rating={rating}
             orderId={orderId}
             productId={id}
           ></OrderRating>

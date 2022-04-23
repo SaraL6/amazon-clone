@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "./firebase";
 import "./Home.css";
 import Product from "./Product";
@@ -15,8 +15,17 @@ function Home() {
   const [unfilteredProducts, setunfilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [value, setCategoryValue] = React.useState();
-  let productsArr = [];
 
+  let productsArr = [];
+  let ratingsArr;
+  let result;
+  let ratings = [];
+  let averageRatings = [];
+  const newDataRef = useRef(null);
+  const resultRef = useRef(null);
+  const averageRatingsRef = useRef(null);
+
+  let isDone = false;
   const onChangeCategory = (newValue) => {
     setCategoryValue(newValue);
     setProducts(unfilteredProducts);
@@ -25,9 +34,10 @@ function Home() {
   async function seederHandler() {
     const response = await fetch(productSeederURL);
     const data = await response.json();
+
     productsArr = data.dataArr;
 
-    console.log("data", data.dataArr);
+    //console.log("data", data.dataArr);
     setProducts(productsArr);
     setunfilteredProducts(productsArr);
     categoryHandler();
@@ -38,44 +48,100 @@ function Home() {
     const data = await response.json();
   }
 
-  async function getProducts() {
-    console.log(products?.length);
-    if (products?.length === 0) {
-      db.collection("products")
-        .get()
-        .then((querySnapshot) => {
-          return Promise.all(
-            querySnapshot.docs.map((doc) => {
-              //  console.log("first", doc.data());
-              productsArr.push(doc.data());
-            })
-          );
-        })
-        .catch(function (err) {
-          console.log(err.message);
+  function getRatings() {
+    db.collectionGroup("ratings")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.map((doc) => {
+          //   console.log("doc", doc.data());
+
+          ratings.push(doc.data());
+          //         getAverage(ratingsArr);
         });
-    }
+        //  console.log(ratings);
+        let newData = newDataRef.current;
+        newData = ratings.reduce((obj, item) => {
+          // console.log("item", item);
+          if (obj[item.productId]) {
+            obj[item.productId].rating.push(item.rating);
+            //console.log(item);
+          } else {
+            item.rating = [item.rating];
+            obj[item.productId] = {
+              ...item,
+            };
+          }
+          return obj;
+        }, {});
+        ratingsArr = Object.values(newData);
+       // console.log("ratings", ratingsArr);
+        return getAverage(ratingsArr);
+      })
+      .catch(function (err) {
+     //   console.log(err.message);
+      });
+  }
+  function getAverage(ratings) {
+  //  console.log(ratings);
+    ratings.forEach((element) => {
+      const avg =
+        element.rating.reduce((a, b) => a + b) / element.rating.length;
+
+      averageRatings.push({ rating: avg, productId: element.productId });
+    //  console.log(averageRatings);
+    });
+    return averageRatings;
   }
 
   useEffect(() => {
     const fetchData = async () => {
       if (products?.length === 0) {
+        let average = averageRatingsRef.current;
+        average = await getRatings();
+        // console.log(average);
         const newData = await db
           .collection("products")
           .get()
           .then((querySnapshot) => {
             querySnapshot.docs.map((doc) => {
-              //  console.log("first", doc.data());
               productsArr.push(doc.data());
             });
           })
           .catch(function (err) {
             console.log(err.message);
           });
-        Promise.all(productsArr).then((content) => {
-          setProducts(content);
-          setunfilteredProducts(content);
+        let result = resultRef.current;
+
+        result = averageRatings?.map((v) => ({
+          ...v,
+          ...productsArr.find((sp) => sp.id === v.productId),
+        }));
+
+        var companyUsers = {}; // hashmap of users using companyId as keys
+
+        products.forEach(function (product) {
+          companyUsers[product.id] = product;
         });
+
+        // map new array based on each subscription
+        var res = result.map(function (sub) {
+          var product = companyUsers[sub.productId];
+          if (product) {
+            for (var key in product) {
+              sub[key] = product[key];
+            }
+          }
+          return sub;
+        });
+     
+        res.map((x) => {
+          let index = productsArr.findIndex((d) => d.id === x.id);
+          productsArr[index] = x;
+        });
+        //console.log("newProducts", productsArr);
+        setProducts(productsArr);
+        setunfilteredProducts(productsArr);
+        isDone = true;
       }
     };
     fetchData();
@@ -88,9 +154,6 @@ function Home() {
         })
       );
     }
-  }, [products, categories]);
-  useEffect(() => {
-    console.log("object", products);
   }, []);
 
   useEffect(() => {
@@ -124,17 +187,16 @@ function Home() {
         ></CategoryFilter>
 
         <div className="home__row">
-          {products?.map((product) => {
-            return (
-              <Product
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                price={product.price}
-                image={product.image}
-              />
-            );
-          })}
+          {products?.map((product) => (
+            <Product
+              key={product.id}
+              id={product.id}
+              title={product.title}
+              price={product.price}
+              image={product.image}
+              rating={product.rating ? product.rating : 0}
+            />
+          ))}
         </div>
         <div className="home__row"></div>
         <div className="home__row">

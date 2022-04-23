@@ -42,9 +42,7 @@ function Orders() {
 
           orderArr = Object.values(newData);
           // console.log(orderArr)
-          const arrayOfObj = Object.entries(newData).map((e) => ({
-            [e[0]]: e[1],
-          }));
+        
 
         
           setOrders(
@@ -59,13 +57,7 @@ function Orders() {
     }
   }, [user]);
 
-  useEffect(() => {
-    console.log("orders", orders);
-
-    // orders.map((order) => {
-    //    console.log("order", order);
-    // });
-  }, [orders, newDataRef]);
+  
   return (
     <div className="orders">
       <h1>Your Orders</h1>

@@ -48,7 +48,7 @@ exports.getProducts = functions
         json: true, // Automatically parses the JSON string in the response
       })
         .then((data) => {
-          console.log(data);
+         // console.log(data);
           let dataArr = Object.values(data);
           var batch = admin.firestore().batch();
 
@@ -123,7 +123,7 @@ exports.getCategories = functions
         json: true, // Automatically parses the JSON string in the response
       })
         .then((data) => {
-          console.log(data);
+         // console.log(data);
           admin.firestore().collection("categories").add({ categories: data });
           return res.status(200).json({
             categories: data,
@@ -140,8 +140,8 @@ exports.getCategories = functions
 
 app.post("/payments/create", async (request, response) => {
   const total = request.query.total;
-  console.log("query", request.query);
-  console.log("Payment Request Recived for this amount:>>>", total);
+  /console.log("query", request.query);
+  //console.log("Payment Request Recived for this amount:>>>", total);
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: total, // subunits of currency

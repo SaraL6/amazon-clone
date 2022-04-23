@@ -7,7 +7,6 @@ import CurrencyFormat from "react-currency-format";
 import { OrderIdContext } from "./OrderIdContext";
 
 function Order({ order }) {
-  console.log("order", order);
 
   return (
     <div className="order">
