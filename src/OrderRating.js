@@ -8,18 +8,22 @@ import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
 import { useStateValue } from "./StateProvider";
 import { OrdersContext } from "./ordersContext";
+import { UserRatingContext } from "./UserRatingContext";
+import { ProductsContext } from "./ProductsContext";
 
-export default function BasicRating({
-  rating,
-  orderId,
-  productId,
-  userRating,
-}) {
+export default function BasicRating({ orderId, productId, userRating }) {
   const [{ basket, user }, dispatch] = useStateValue();
   // const { starValue, setValue } = useContext(UserRatingContext);
   const [starValue, setValue] = useState(userRating);
   const [ratingState, setRating] = useState(false);
   const { orders, setOrders } = useContext(OrdersContext);
+  const { productUserRating, setProductUserRating } =
+    useContext(UserRatingContext);
+  const { products, setProducts } = useContext(ProductsContext);
+
+  //console.log("checkoutUserRating", productUserRating, "productId", productId);
+  let productsArr = [];
+  let ratings = [];
   let docRef = db
     .collection("users")
     .doc(user?.uid)
@@ -30,6 +34,41 @@ export default function BasicRating({
 
   let productRatings = db.collection("products").doc(`${productId}`);
   useEffect(() => {
+    db.collectionGroup("ratings")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.map((doc) => {
+          if (doc.data().orderId == orderId) {
+            console.log("doc", doc.data());
+            setProductUserRating(doc.data().rating);
+            setValue(doc.data().rating);
+          }
+        });
+      });
+    console.log("starValue", starValue);
+  }, []);
+
+  useEffect(() => {
+    // console.log("products", products);
+    products?.forEach((product) => {
+      if (product.id == productId) {
+        product.orderIds.forEach((order, key) => {
+          if (order.orderId == orderId) {
+            //  console.log(order);
+            order.userRating = productUserRating;
+            //  console.log("order", order);
+          }
+        });
+      } else {
+        console.log("error");
+      }
+    });
+  }, [products]);
+
+  useEffect(() => {
+    // console.log("starValue", starValue);
+    setProductUserRating(userRating);
+
     if (user) {
       if (ratingState) {
         docRef
@@ -45,14 +84,12 @@ export default function BasicRating({
                   .doc(user?.uid)
                   .update({ rating: starValue });
               } else {
-                productRatings
-                  .collection("ratings")
-                  .doc(user?.uid)
-                  .set({
-                    userId: user?.uid,
-                    rating: starValue,
-                    productId: productId,
-                  });
+                productRatings.collection("ratings").doc(user?.uid).set({
+                  userId: user?.uid,
+                  rating: starValue,
+                  productId: productId,
+                  orderId: orderId,
+                });
               }
             });
           });
@@ -61,6 +98,14 @@ export default function BasicRating({
       setOrders([]);
     }
   }, [starValue]);
+  useEffect(() => {
+    if (userRating) {
+      //console.log("userRATING", userRating);
+
+      setProductUserRating(userRating);
+      //  console.log("productUserRating", productUserRating);
+    }
+  }, [userRating]);
 
   return (
     <Box
@@ -75,8 +120,9 @@ export default function BasicRating({
         precision={0.5}
         onChange={(event, newValue) => {
           setValue(newValue);
+
           setRating(true);
-          // console.log("newValue", newValue);
+          setProductUserRating(newValue);
         }}
       />
     </Box>

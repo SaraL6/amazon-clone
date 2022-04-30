@@ -9,6 +9,10 @@ import { forwardRef } from "react";
 function Checkout() {
   const [{ basket, user }, dispatch] = useStateValue();
 
+  basket.map((index) => {
+    return console.log("product", index);
+  });
+
   return (
     <div className="checkout">
       <div className="checkout__left">
@@ -27,7 +31,7 @@ function Checkout() {
               title={item.title}
               image={item.image}
               price={item.price}
-             // rating={item.rating}
+              // rating={item.rating}
               userRating={item.userRating ? item.userRating : 0}
             />
           ))}

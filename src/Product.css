@@ -13,7 +13,7 @@
   z-index: 1;
 }
 
-.product__rating{
+.product__rating {
   display: flex;
 }
 .product > img {
@@ -28,17 +28,18 @@
   margin-top: 10px;
   border-color: #a88734 #9c7e31 #846a29;
   color: #111;
-
-
 }
 
-.product__price{
+.product__price {
   margin-top: 5px;
 }
 
-.product__info{
+.product__info {
   height: 100px;
   margin-bottom: 15px;
 }
-
-
+a {
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+}

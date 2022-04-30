@@ -6,13 +6,15 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Checkout from "./Checkout";
 import Login from "./Login";
 import Payment from "./Payment";
+import SingleProduct from "./SingleProduct";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import Orders from "./Orders";
 import { OrdersContext } from "./ordersContext";
-import { OrderIdContext } from "./OrderIdContext";
+import { UserRatingContext } from "./UserRatingContext";
+import { ProductsContext } from "./ProductsContext";
 
 const promise = loadStripe(
   "pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1"
@@ -28,7 +30,8 @@ function App() {
   //   });
   // });
   const [orders, setOrders] = useState([]);
-  const [basketOrderId, setbasketOrderId] = useState();
+  const [productUserRating, setProductUserRating] = useState();
+  const [products, setProducts] = useState([]);
   const [{}, dispatch] = useStateValue();
 
   useEffect(() => {
@@ -58,35 +61,44 @@ function App() {
     <Router>
       <div className="App">
         <OrdersContext.Provider value={{ orders, setOrders }}>
-          <OrderIdContext.Provider value={{ basketOrderId, setbasketOrderId }}>
-            <Switch>
-              <Route path="/orders">
-                <Header />
-                <Orders />
-              </Route>
-              <Route path="/login">
-                <Login />
-              </Route>
+          <UserRatingContext.Provider
+            value={{ productUserRating, setProductUserRating }}
+          >
+            <ProductsContext.Provider value={{ products, setProducts }}>
+              <Switch>
+                <Route exact path="/orders">
+                  <Header />
+                  <Orders />
+                </Route>
 
-              <Route path="/checkout">
-                <Header />
-                <Checkout />
-              </Route>
+                <Route exact path="/login">
+                  <Login />
+                </Route>
 
-              <Route path="/payment">
-                <Header />
-                <Elements stripe={promise}>
-                  <Payment />
-                </Elements>
-              </Route>
+                <Route exact path="/checkout">
+                  <Header />
+                  <Checkout />
+                </Route>
 
-              <Route path="/">
-                <Header />
+                <Route exact path="/payment">
+                  <Header />
+                  <Elements stripe={promise}>
+                    <Payment />
+                  </Elements>
+                </Route>
 
-                <Home />
-              </Route>
-            </Switch>
-          </OrderIdContext.Provider>
+                <Route exact path="/product/:id">
+                  <Header />
+                  <SingleProduct />
+                </Route>
+
+                <Route exact path="/">
+                  <Header />
+                  <Home />
+                </Route>
+              </Switch>
+            </ProductsContext.Provider>
+          </UserRatingContext.Provider>
         </OrdersContext.Provider>
       </div>
     </Router>

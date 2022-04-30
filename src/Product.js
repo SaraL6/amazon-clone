@@ -2,9 +2,9 @@ import HomeRating from "./HomeRating";
 import React from "react";
 import "./Product.css";
 import { useStateValue } from "./StateProvider";
-import { useState, useEffect } from "react";
-import { db } from "./firebase";
-function Product({ id, title, image, price, rating }) {
+import { Link } from "react-router-dom";
+
+function Product({ id, title, image, price, rating, description, orders }) {
   const [{ basket, user }, dispatch] = useStateValue();
   const addToBasket = () => {
     // dispatch the item into the
@@ -23,7 +23,24 @@ function Product({ id, title, image, price, rating }) {
   return (
     <div className="product">
       <div className="product__info">
-        <p>{title}</p>
+        <Link
+          to={{
+            pathname: "/product/" + id,
+            state: {
+              id: id,
+              title: title,
+              image: image,
+              price: price,
+              rating: rating,
+              description: description,
+              orders: orders,
+              userId: user?.uid,
+            },
+          }}
+        >
+          <p>{title}</p>
+        </Link>
+
         <p className="product__price">
           <small>$</small>
           <strong>{price}</strong>

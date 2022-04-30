@@ -5,12 +5,9 @@ import "./Orders.css";
 import { useStateValue } from "./StateProvider";
 import Order from "./Order";
 import { OrdersContext } from "./ordersContext";
-import { OrderIdContext } from "./OrderIdContext";
 function Orders() {
   const [{ basket, user }, dispatch] = useStateValue();
-
   const { orders, setOrders } = useContext(OrdersContext);
-  const { basketOrderId, setbasketOrderId } = useContext(OrderIdContext);
   let usersRef = db.collection("users");
 
   let products = [];
@@ -63,7 +60,7 @@ function Orders() {
       <h1>Your Orders</h1>
       <div className="orders__order">
         {orders?.map((order) => {
-          return <Order order={order} />;
+          return <Order order={order} key={order.orderId}/>;
         })}
       </div>
     </div>

@@ -1,9 +1,12 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
+import { Link } from "react-router-dom";
 import { db } from "./firebase";
 import "./Home.css";
 import Product from "./Product";
 import CategoryFilter from "./CategoryFilter";
+import { UserRatingContext } from "./UserRatingContext";
+import { ProductsContext } from "./ProductsContext";
 
 function Home() {
   const productSeederURL =
@@ -11,14 +14,16 @@ function Home() {
   const categorySeederUrl =
     "http://localhost:5001/clone-2d894/us-central1/getCategories";
 
-  const [products, setProducts] = useState([]);
+  const { products, setProducts } = useContext(ProductsContext);
   const [unfilteredProducts, setunfilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [value, setCategoryValue] = React.useState();
 
+  const { productUserRating, setProductUserRating } =
+    useContext(UserRatingContext);
+  //console.log(productUserRating);
   let productsArr = [];
   let ratingsArr;
-  let result;
   let ratings = [];
   let averageRatings = [];
   const newDataRef = useRef(null);
@@ -53,92 +58,141 @@ function Home() {
       .get()
       .then((snapshot) => {
         snapshot.docs.map((doc) => {
-          //   console.log("doc", doc.data());
+          //  console.log("doc", doc.data());
 
           ratings.push(doc.data());
+          // console.log("first", ratings);
           //         getAverage(ratingsArr);
         });
-        //  console.log(ratings);
-        let newData = newDataRef.current;
-        newData = ratings.reduce((obj, item) => {
-          // console.log("item", item);
-          if (obj[item.productId]) {
-            obj[item.productId].rating.push(item.rating);
-            //console.log(item);
-          } else {
-            item.rating = [item.rating];
-            obj[item.productId] = {
-              ...item,
+        // let newData = newDataRef.current;
+        // newData = ratings.reduce((obj, item) => {
+        //   if (obj[item.productId]) {
+        //     obj[item.productId].rating.push(item.rating);
+        //   } else {
+        //     item.rating = [item.rating];
+        //     obj[item.productId] = {
+        //       ...item,
+        //     };
+        //   }
+        //   return obj;
+        // }, {});
+        // ratingsArr = Object.values(newData);
+        // console.log("ratings", ratings);
+        let result = ratings.reduce(
+          (r, { productId, orderId, rating, userId }) => {
+            r[productId] = r[productId] || {
+              productId,
+              orderId,
+              rating: [],
+              userId,
             };
-          }
-          return obj;
-        }, {});
-        ratingsArr = Object.values(newData);
-       // console.log("ratings", ratingsArr);
+            r[productId].rating.push({
+              orderId: orderId,
+              rating: rating,
+              userId: userId,
+            });
+            return r;
+          },
+          {}
+        );
+        ratingsArr = Object.values(result);
+
+        ratingsArr.forEach((element) => {
+          // console.log(element);
+          element.rating.map((rating) => {
+            //  return console.log("first", rating);
+          });
+        });
+        //  console.log("result", ratingsArr);
         return getAverage(ratingsArr);
       })
       .catch(function (err) {
-     //   console.log(err.message);
+        //   console.log(err.message);
       });
   }
-  function getAverage(ratings) {
-  //  console.log(ratings);
-    ratings.forEach((element) => {
-      const avg =
-        element.rating.reduce((a, b) => a + b) / element.rating.length;
+  async function getAverage(ratings) {
+    await ratings.forEach((rating) => {
+      //console.log(rating.productId);
+      let r = rating.rating;
+      // console.log("r", r);
+      let sum = 0;
+      let orderIds = [];
+      r.forEach(async (element) => {
+        // console.log(element);
 
-      averageRatings.push({ rating: avg, productId: element.productId });
-    //  console.log(averageRatings);
+        sum += element.rating;
+        orderIds.push({
+          orderId: element.orderId,
+          userId: element.userId,
+          userRating: element.rating,
+        });
+      });
+      const avg = sum / r.length;
+      averageRatings.push({
+        rating: avg,
+        productId: rating.productId,
+        orderIds: orderIds,
+      });
+      // console.log("avrgR", averageRatings);
     });
     return averageRatings;
   }
 
   useEffect(() => {
+    console.log("products", products);
     const fetchData = async () => {
       if (products?.length === 0) {
         let average = averageRatingsRef.current;
         average = await getRatings();
-        // console.log(average);
         const newData = await db
           .collection("products")
           .get()
           .then((querySnapshot) => {
             querySnapshot.docs.map((doc) => {
               productsArr.push(doc.data());
+              //     console.log(productsArr);
             });
           })
           .catch(function (err) {
             console.log(err.message);
           });
         let result = resultRef.current;
-
-        result = averageRatings?.map((v) => ({
-          ...v,
-          ...productsArr.find((sp) => sp.id === v.productId),
-        }));
-
-        var companyUsers = {}; // hashmap of users using companyId as keys
-
-        products.forEach(function (product) {
-          companyUsers[product.id] = product;
-        });
-
-        // map new array based on each subscription
-        var res = result.map(function (sub) {
-          var product = companyUsers[sub.productId];
-          if (product) {
-            for (var key in product) {
-              sub[key] = product[key];
+        productsArr.forEach((product, key) => {
+          averageRatings?.forEach((avgRating) => {
+            if (avgRating?.productId == product.id) {
+              productsArr[key] = { ...product, ...avgRating };
             }
-          }
-          return sub;
+          });
         });
-     
-        res.map((x) => {
-          let index = productsArr.findIndex((d) => d.id === x.id);
-          productsArr[index] = x;
-        });
-        //console.log("newProducts", productsArr);
+        // result = averageRatings?.map((v) => ({
+        //   ...v,
+        //   ...productsArr.find((sp) => sp.id === v.productId),
+        // }));
+        // console.log("result", productsArr);
+        ///////
+        // var companyUsers = {}; // hashmap of users using companyId as keys
+
+        // products.forEach(function (product) {
+        //   companyUsers[product.id] = product;
+        // });
+
+        // // map new array based on each subscription
+        // var res = result.map(function (sub) {
+        //   var product = companyUsers[sub.productId];
+        //   if (product) {
+        //     for (var key in product) {
+        //       sub[key] = product[key];
+        //     }
+        //   }
+        //   return sub;
+        // });
+        //  console.log("res", res);
+        // result.map((x) => {
+        //   let index = productsArr.findIndex((d) => d.id === x.productId);
+        //   productsArr[index] = x;
+        //   //   console.log("productsArr", x);
+        // });
+        // console.log("newProducts", productsArr);
         setProducts(productsArr);
         setunfilteredProducts(productsArr);
         isDone = true;
@@ -194,7 +248,9 @@ function Home() {
               title={product.title}
               price={product.price}
               image={product.image}
+              description={product.description}
               rating={product.rating ? product.rating : 0}
+              orders={product.orderIds}
             />
           ))}
         </div>

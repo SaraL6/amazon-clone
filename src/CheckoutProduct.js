@@ -1,20 +1,23 @@
 import React from "react";
 import "./CheckoutProduct.css";
+import { useContext, useEffect } from "react";
 import OrderRating from "./OrderRating";
 import { useStateValue } from "./StateProvider";
+import { UserRatingContext } from "./UserRatingContext";
 
 function CheckoutProduct({
   id,
   image,
   title,
   price,
-  rating,
   userRating,
   hideButton,
   orderId,
 }) {
   const [{ basket }, dispatch] = useStateValue();
-  //console.log(orderId);
+  const { productUserRating, setProductUserRating } =
+    useContext(UserRatingContext);
+
   const removeFromBasket = () => {
     // remove item from basket
     dispatch({
@@ -22,6 +25,10 @@ function CheckoutProduct({
       id: id,
     });
   };
+  useEffect(() => {
+   // console.log("first", userRating);
+    userRating && setProductUserRating(userRating);
+  }, []);
 
   return (
     <div className="checkoutProduct">
@@ -44,12 +51,13 @@ function CheckoutProduct({
           <strong>{price}</strong>{" "}
         </p>
         <div className="checkoutProduct__rating">
-          <OrderRating
-            userRating={userRating}
-            rating={rating}
-            orderId={orderId}
-            productId={id}
-          ></OrderRating>
+          {productUserRating && (
+            <OrderRating
+              userRating={productUserRating}
+              orderId={orderId}
+              productId={id}
+            ></OrderRating>
+          )}
         </div>
         {!hideButton && (
           <button onClick={removeFromBasket}>Remove from basket</button>
