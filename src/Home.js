@@ -1,6 +1,8 @@
 import React from "react";
 import { useState, useEffect, useRef, useContext } from "react";
 import { Link } from "react-router-dom";
+import { useStateValue } from "./StateProvider";
+
 import { db } from "./firebase";
 import "./Home.css";
 import Product from "./Product";
@@ -13,15 +15,16 @@ function Home() {
     "http://localhost:5001/clone-2d894/us-central1/getProducts";
   const categorySeederUrl =
     "http://localhost:5001/clone-2d894/us-central1/getCategories";
+  const [{ basket, user }, dispatch] = useStateValue();
 
   const { products, setProducts } = useContext(ProductsContext);
   const [unfilteredProducts, setunfilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [isAuth, setisAuth] = useState(false);
   const [value, setCategoryValue] = React.useState();
-
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
-  //console.log(productUserRating);
+
   let productsArr = [];
   let ratingsArr;
   let ratings = [];
@@ -61,7 +64,6 @@ function Home() {
           //  console.log("doc", doc.data());
 
           ratings.push(doc.data());
-          // console.log("first", ratings);
           //         getAverage(ratingsArr);
         });
         // let newData = newDataRef.current;
@@ -97,12 +99,6 @@ function Home() {
         );
         ratingsArr = Object.values(result);
 
-        ratingsArr.forEach((element) => {
-          // console.log(element);
-          element.rating.map((rating) => {
-            //  return console.log("first", rating);
-          });
-        });
         //  console.log("result", ratingsArr);
         return getAverage(ratingsArr);
       })
@@ -133,13 +129,34 @@ function Home() {
         productId: rating.productId,
         orderIds: orderIds,
       });
-      // console.log("avrgR", averageRatings);
+
+       console.log("avrgR", averageRatings);
     });
     return averageRatings;
   }
+  useEffect(() => {
+    user != "undefined" ? setisAuth(true) : setisAuth(false);
+    const fetchRatings = async () => {
+      if (user) {
+        db.collectionGroup("basket")
+          .where("userId", "==", user?.uid)
+          .orderBy("created", "desc")
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.docs.forEach((doc) => {
+            //  console.log("ratings", doc.data());
+            });
+          });
+      }
+    };
+    fetchRatings();
+  }, [user]);
 
   useEffect(() => {
-    console.log("products", products);
+//console.log("averageR", averageRatings);
+  }, [products]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (products?.length === 0) {
         let average = averageRatingsRef.current;
@@ -150,13 +167,11 @@ function Home() {
           .then((querySnapshot) => {
             querySnapshot.docs.map((doc) => {
               productsArr.push(doc.data());
-              //     console.log(productsArr);
             });
           })
           .catch(function (err) {
             console.log(err.message);
           });
-        let result = resultRef.current;
         productsArr.forEach((product, key) => {
           averageRatings?.forEach((avgRating) => {
             if (avgRating?.productId == product.id) {
@@ -164,35 +179,7 @@ function Home() {
             }
           });
         });
-        // result = averageRatings?.map((v) => ({
-        //   ...v,
-        //   ...productsArr.find((sp) => sp.id === v.productId),
-        // }));
-        // console.log("result", productsArr);
-        ///////
-        // var companyUsers = {}; // hashmap of users using companyId as keys
-
-        // products.forEach(function (product) {
-        //   companyUsers[product.id] = product;
-        // });
-
-        // // map new array based on each subscription
-        // var res = result.map(function (sub) {
-        //   var product = companyUsers[sub.productId];
-        //   if (product) {
-        //     for (var key in product) {
-        //       sub[key] = product[key];
-        //     }
-        //   }
-        //   return sub;
-        // });
-        //  console.log("res", res);
-        // result.map((x) => {
-        //   let index = productsArr.findIndex((d) => d.id === x.productId);
-        //   productsArr[index] = x;
-        //   //   console.log("productsArr", x);
-        // });
-        // console.log("newProducts", productsArr);
+     
         setProducts(productsArr);
         setunfilteredProducts(productsArr);
         isDone = true;
@@ -212,7 +199,6 @@ function Home() {
 
   useEffect(() => {
     if (value && value.length > 0) {
-      // console.log(products);
       var reduced = products.reduce(function (filtered, product) {
         if (product.category === value) {
           var someNewValue = product;
@@ -249,8 +235,8 @@ function Home() {
               price={product.price}
               image={product.image}
               description={product.description}
-              rating={product.rating ? product.rating : 0}
-              orders={product.orderIds}
+              rating={product.averageRating ? product.averageRating : 0}
+              orders={product?.orderIds}
             />
           ))}
         </div>

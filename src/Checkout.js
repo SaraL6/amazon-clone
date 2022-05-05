@@ -9,9 +9,7 @@ import { forwardRef } from "react";
 function Checkout() {
   const [{ basket, user }, dispatch] = useStateValue();
 
-  basket.map((index) => {
-    return console.log("product", index);
-  });
+
 
   return (
     <div className="checkout">

@@ -4,6 +4,7 @@ import { useStateValue } from "./StateProvider";
 import HomeRating from "./HomeRating";
 import OrderRating from "./OrderRating";
 import { UserRatingContext } from "./UserRatingContext";
+import { ProductsContext } from "./ProductsContext";
 
 import "./SingleProduct.css";
 function SingleProduct() {
@@ -11,6 +12,7 @@ function SingleProduct() {
   const [orderId, setOrderId] = useState(null);
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
+  const { products, setProducts } = useContext(ProductsContext);
 
   const addToBasket = () => {
     // dispatch the item into the
@@ -28,27 +30,21 @@ function SingleProduct() {
 
   const location = useLocation();
 
-  console.log(location);
 
   useEffect(() => {
-    console.log("singleproductuserRating", productUserRating);
-
     location.state.orders &&
       location.state.orders.forEach((order) => {
         if (order?.userId === location.state.userId) {
-          //  console.log(order?.orderId);
           setOrderId(order?.orderId);
-          
-         setProductUserRating(order?.userRating);
+
+          setProductUserRating(order?.userRating);
         } else {
           console.log("error");
         }
       });
   }, []);
 
-  useEffect(() => {
-    console.log("singleproductuserRating", productUserRating);
-  }, [productUserRating]);
+
 
   return (
     <div className="singleProduct">
@@ -60,6 +56,7 @@ function SingleProduct() {
               userRating={productUserRating}
               orderId={orderId}
               productId={location.state.id + ""}
+              rating={location.state.rating}
             ></OrderRating>
           )}
         </div>
@@ -68,7 +65,7 @@ function SingleProduct() {
         <h3>{location.state.title}</h3>
         <p>{location.state.description}</p>
 
-        <HomeRating rating={location.state.rating} />
+        <HomeRating rating={location.state.rating} productId={location.state.id} />
         <div className="add">
           <h3 className="price">{location.state.price} $</h3>
           <button onClick={addToBasket}>Add to Basket</button>

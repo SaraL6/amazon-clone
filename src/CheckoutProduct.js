@@ -17,7 +17,6 @@ function CheckoutProduct({
   const [{ basket }, dispatch] = useStateValue();
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
-
   const removeFromBasket = () => {
     // remove item from basket
     dispatch({
@@ -26,7 +25,7 @@ function CheckoutProduct({
     });
   };
   useEffect(() => {
-   // console.log("first", userRating);
+    // console.log("first", userRating);
     userRating && setProductUserRating(userRating);
   }, []);
 
@@ -51,13 +50,13 @@ function CheckoutProduct({
           <strong>{price}</strong>{" "}
         </p>
         <div className="checkoutProduct__rating">
-          {productUserRating && (
+         
             <OrderRating
               userRating={productUserRating}
               orderId={orderId}
               productId={id}
             ></OrderRating>
-          )}
+          
         </div>
         {!hideButton && (
           <button onClick={removeFromBasket}>Remove from basket</button>

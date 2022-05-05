@@ -20,10 +20,10 @@ export default function BasicRating({ orderId, productId, userRating }) {
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
   const { products, setProducts } = useContext(ProductsContext);
-
+  let ratingsArr = [];
+  let orderIds = [];
   //console.log("checkoutUserRating", productUserRating, "productId", productId);
   let productsArr = [];
-  let ratings = [];
   let docRef = db
     .collection("users")
     .doc(user?.uid)
@@ -39,20 +39,20 @@ export default function BasicRating({ orderId, productId, userRating }) {
       .then((snapshot) => {
         snapshot.docs.map((doc) => {
           if (doc.data().orderId == orderId) {
-            console.log("doc", doc.data());
             setProductUserRating(doc.data().rating);
             setValue(doc.data().rating);
           }
         });
       });
-    console.log("starValue", starValue);
+    //    console.log("starValue", starValue);
   }, []);
 
   useEffect(() => {
     // console.log("products", products);
     products?.forEach((product) => {
+    //  console.log("product", product);
       if (product.id == productId) {
-        product.orderIds.forEach((order, key) => {
+    product.orderIds &&    product?.orderIds.forEach((order, key) => {
           if (order.orderId == orderId) {
             //  console.log(order);
             order.userRating = productUserRating;
@@ -84,12 +84,62 @@ export default function BasicRating({ orderId, productId, userRating }) {
                   .doc(user?.uid)
                   .update({ rating: starValue });
               } else {
-                productRatings.collection("ratings").doc(user?.uid).set({
-                  userId: user?.uid,
-                  rating: starValue,
-                  productId: productId,
-                  orderId: orderId,
-                });
+                productRatings
+                  .collection("ratings")
+                  .doc(user?.uid)
+                  .set({
+                    userId: user?.uid,
+                    rating: starValue,
+                    productId: productId,
+                    orderId: orderId,
+                  })
+                  .then(() => {
+                    db.collectionGroup("ratings")
+                      .get()
+                      .then((snapshot) => {
+                        let sum = 0;
+
+                        snapshot.docs.map((doc) => {
+                          if (doc.data().productId == productId) {
+                            ratingsArr.push(doc.data().rating);
+                            sum += doc.data().rating;
+                            orderIds.push({
+                              orderId: doc.data().orderId,
+                              userId: doc.data().userId,
+                              userRating: doc.data().rating,
+                              productId: doc.data().productId,
+                            });
+                          }
+                        });
+                        const avg = sum / ratingsArr.length;
+                    
+                        productRatings
+                          .update({
+                            averageRating: avg,
+                            productId: productId,
+                               orderIds: orderIds,
+                          })
+                          .then(() => {
+                            console.log("Document successfully written!");
+                          })
+                          .catch((error) => {
+                            console.error("Error writing document: ", error);
+                          })
+                          .then(() => {
+                            db.collection("products")
+                              .get()
+                              .then((querySnapshot) => {
+                                querySnapshot.docs.forEach((doc) => {
+                                  productsArr.push(doc.data());
+                                });
+                              })
+                              .catch(function (err) {
+                                console.log(err.message);
+                              });
+                            setProducts(productsArr);
+                          });
+                      });
+                  });
               }
             });
           });
