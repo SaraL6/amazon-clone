@@ -29,8 +29,7 @@ function SingleProduct() {
   };
 
   const location = useLocation();
-
-
+  console.log(location);
   useEffect(() => {
     location.state.orders &&
       location.state.orders.forEach((order) => {
@@ -44,31 +43,40 @@ function SingleProduct() {
       });
   }, []);
 
-
-
   return (
     <div className="singleProduct">
       <div className="image">
         <img src={location.state.image + ""} alt="" className="productimg" />
         <div className="rate">
           {orderId && (
-            <OrderRating
-              userRating={productUserRating}
-              orderId={orderId}
-              productId={location.state.id + ""}
-              rating={location.state.rating}
-            ></OrderRating>
+            <>
+              <OrderRating
+                userRating={productUserRating}
+                orderId={orderId}
+                productId={location.state.id + ""}
+                rating={location.state.rating}
+              ></OrderRating>
+            </>
           )}
         </div>
       </div>
       <div className="details">
-        <h3>{location.state.title}</h3>
+        <h2>{location.state.title}</h2>
+        <h3>About this item</h3>
         <p>{location.state.description}</p>
-
-        <HomeRating rating={location.state.rating} productId={location.state.id} />
+        <div className="averageRate">
+          <HomeRating
+            rating={location.state.rating}
+            productId={location.state.id}
+          />
+          <small>
+            {location.state.orders.length}
+            {location.state.orders.length > 1 ? ` ratings` : ` rating`}
+          </small>
+        </div>
         <div className="add">
           <h3 className="price">{location.state.price} $</h3>
-          <button onClick={addToBasket}>Add to Basket</button>
+          <button className="button-14" onClick={addToBasket}>Add to Basket</button>
         </div>
       </div>
     </div>

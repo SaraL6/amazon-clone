@@ -44,7 +44,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
           }
         });
       });
-    //    console.log("starValue", starValue);
   }, []);
 
   useEffect(() => {

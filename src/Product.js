@@ -60,7 +60,9 @@ function Product({ id, title, image, price, rating, description, orders }) {
             "https://vermeeraustralia.com.au/wp-content/uploads/2016/12/attachment-no-image-available.png")
         )}
       />
-      <button onClick={addToBasket}>Add to Basket</button>
+      <button className="button-14" onClick={addToBasket}>
+        Add to Basket
+      </button>
     </div>
   );
 }

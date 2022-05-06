@@ -1,3 +1,11 @@
+
+
+@font-face {
+  font-family: "amazon-ember";
+  src: url(/src/fonts/AmazonEmber/AmazonEmber.ttf);
+}
+
 body {
   overflow-x: hidden;
+  font-family: "amazon-ember";
 }
