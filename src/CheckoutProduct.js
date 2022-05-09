@@ -1,6 +1,6 @@
 import React from "react";
 import "./CheckoutProduct.css";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import OrderRating from "./OrderRating";
 import { useStateValue } from "./StateProvider";
 import { UserRatingContext } from "./UserRatingContext";
@@ -24,7 +24,7 @@ function CheckoutProduct({
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
   const { orders, setOrders } = useContext(OrdersContext);
-
+  const [hideRating, setHideRating] = useState(true);
   let location = useLocation();
 
   const removeFromBasket = () => {
@@ -37,6 +37,10 @@ function CheckoutProduct({
   useEffect(() => {
     // console.log("first", userRating);
     userRating && setProductUserRating(userRating);
+    if (location.pathname === "/payment" || "/checkout") {
+      console.log(location.pathname);
+      setHideRating(false);
+    }
   }, []);
 
   return (
@@ -76,13 +80,13 @@ function CheckoutProduct({
           <strong>{price}</strong>{" "}
         </p>
         <div className="checkoutProduct__rating">
-          {location.pathname !== ("/checkout" || "/payment") ? (
+          {hideRating && (
             <OrderRating
               userRating={productUserRating}
               orderId={orderId}
               productId={id}
             ></OrderRating>
-          ) : null}
+          )}
         </div>
         {!hideButton && (
           <button onClick={removeFromBasket}>Remove from basket</button>

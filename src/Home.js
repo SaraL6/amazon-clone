@@ -130,7 +130,6 @@ function Home() {
         orderIds: orderIds,
       });
 
-       console.log("avrgR", averageRatings);
     });
     return averageRatings;
   }

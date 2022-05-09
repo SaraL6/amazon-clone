@@ -30,7 +30,6 @@ function SingleProduct() {
   };
 
   const location = useLocation();
-  console.log(location.state);
   useEffect(() => {
     location.state.orders &&
       location.state.orders.forEach((order) => {
