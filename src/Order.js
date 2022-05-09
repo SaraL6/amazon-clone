@@ -1,12 +1,19 @@
 import React from "react";
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 import "./Order.css";
 import moment from "moment";
 import CheckoutProduct from "./CheckoutProduct";
 import CurrencyFormat from "react-currency-format";
+import { useStateValue } from "./StateProvider";
+import { Link } from "react-router-dom";
 
 function Order({ order }) {
-
+  const [{ basket, user }, dispatch] = useStateValue();
+useEffect(() => {
+order.products.map((item)=>{
+ console.log("item",item)
+})
+}, [])
 
   return (
     <div className="order">
@@ -16,19 +23,24 @@ function Order({ order }) {
       <p className="order__id">
         <small>{order.orderId}</small>
       </p>
+
       {order.products.map((item) => (
-        <CheckoutProduct
-          key={item.id}
-          orderId={order.orderId}
-          id={item.id}
-          title={item.title}
-          image={item.image}
-          price={item.price}
-          rating={item.rating}
-          userRating={item.userRating ? item.userRating : 0}
-          hideButton
-        />
+  
+          <CheckoutProduct
+            key={item.id}
+            orderId={order.orderId}
+            id={item.id}
+            title={item.title}
+            description={item.description}
+            image={item.image}
+            price={item.price}
+            rating={item.rating}
+            orders={item.orders}
+            userRating={item.userRating ? item.userRating : 0}
+            hideButton
+          />
       ))}
+
       <CurrencyFormat
         renderText={(value) => (
           <h3 className="order__total">Order Total: {value}</h3>

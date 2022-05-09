@@ -4,19 +4,29 @@ import { useContext, useEffect } from "react";
 import OrderRating from "./OrderRating";
 import { useStateValue } from "./StateProvider";
 import { UserRatingContext } from "./UserRatingContext";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { OrdersContext } from "./ordersContext";
 
 function CheckoutProduct({
   id,
   image,
   title,
+  description,
   price,
   userRating,
+  //orders,
+  rating,
   hideButton,
   orderId,
 }) {
-  const [{ basket }, dispatch] = useStateValue();
+  const [{ basket, user }, dispatch] = useStateValue();
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
+  const { orders, setOrders } = useContext(OrdersContext);
+
+  let location = useLocation();
+
   const removeFromBasket = () => {
     // remove item from basket
     dispatch({
@@ -27,6 +37,7 @@ function CheckoutProduct({
   useEffect(() => {
     // console.log("first", userRating);
     userRating && setProductUserRating(userRating);
+    console.log("Rating:", userRating, "id:", id, "orderId:", orderId);
   }, []);
 
   return (
@@ -43,20 +54,36 @@ function CheckoutProduct({
       />
 
       <div className="checkoutProduct__info">
-        <p className="checkoutProduct__title">{title}</p>
+        <Link
+          to={{
+            pathname: "/product/" + id,
+            state: {
+              id: id,
+              title: title,
+              image: image,
+              price: price,
+              rating: userRating,
+              description: description,
+              orders: orders,
+              userId: user?.uid,
+            },
+          }}
+        >
+          <p className="checkoutProduct__title">{title}</p>{" "}
+        </Link>
 
         <p className="checkoutProduct__price">
           <small>$</small>
           <strong>{price}</strong>{" "}
         </p>
         <div className="checkoutProduct__rating">
-         
+          {location.pathname !== ("/checkout" || "/payment") ? (
             <OrderRating
               userRating={productUserRating}
               orderId={orderId}
               productId={id}
             ></OrderRating>
-          
+          ) : null}
         </div>
         {!hideButton && (
           <button onClick={removeFromBasket}>Remove from basket</button>

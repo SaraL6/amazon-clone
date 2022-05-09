@@ -110,7 +110,7 @@ function Home() {
     await ratings.forEach((rating) => {
       //console.log(rating.productId);
       let r = rating.rating;
-      // console.log("r", r);
+    //   console.log("r", r);
       let sum = 0;
       let orderIds = [];
       r.forEach(async (element) => {
@@ -152,9 +152,9 @@ function Home() {
     fetchRatings();
   }, [user]);
 
-  useEffect(() => {
-//console.log("averageR", averageRatings);
-  }, [products]);
+//   useEffect(() => {
+// console.log("averageR", averageRatings);
+//   }, [averageRatings]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -172,15 +172,18 @@ function Home() {
           .catch(function (err) {
             console.log(err.message);
           });
+        //  console.log(averageRatings)
         productsArr.forEach((product, key) => {
           averageRatings?.forEach((avgRating) => {
             if (avgRating?.productId == product.id) {
               productsArr[key] = { ...product, ...avgRating };
+              console.log(productsArr[key] );
             }
           });
         });
      
         setProducts(productsArr);
+        console.log(productsArr)
         setunfilteredProducts(productsArr);
         isDone = true;
       }
@@ -236,7 +239,7 @@ function Home() {
               image={product.image}
               description={product.description}
               rating={product.averageRating ? product.averageRating : 0}
-              orders={product?.orderIds}
+              orders={product?.orderIds ? product?.orderIds : 0 }
             />
           ))}
         </div>

@@ -5,6 +5,7 @@ import HomeRating from "./HomeRating";
 import OrderRating from "./OrderRating";
 import { UserRatingContext } from "./UserRatingContext";
 import { ProductsContext } from "./ProductsContext";
+import { OrdersContext } from "./ordersContext";
 
 import "./SingleProduct.css";
 function SingleProduct() {
@@ -34,14 +35,24 @@ function SingleProduct() {
     location.state.orders &&
       location.state.orders.forEach((order) => {
         if (order?.userId === location.state.userId) {
-          setOrderId(order?.orderId);
+          console.log("order", order);
 
-          setProductUserRating(order?.userRating);
+          order?.products?.forEach((element) => {
+            if (element.id == location.state.id) {
+              console.log("element", element);
+              setOrderId(order?.orderId);
+              setProductUserRating(element?.userRating);
+              console.log("productUserRating", productUserRating);
+            }
+          });
         } else {
           console.log("error");
         }
       });
   }, []);
+  useEffect(() => {
+    console.log("orderId", orderId);
+  }, [orderId]);
 
   return (
     <div className="singleProduct">
@@ -70,13 +81,22 @@ function SingleProduct() {
             productId={location.state.id}
           />
           <small>
-            {location.state.orders.length}
-            {location.state.orders.length > 1 ? ` ratings` : ` rating`}
+            {/* {location.state.orders == 0
+              ? "No ratings yet"
+              : location.state.orders.length}
+            {location.state.orders.length > 1 ? ` ratings` : ` rating`} */}
+            {/* {location.state.orders == 0
+              ? "No ratings yet"
+              : location.state.orders.length > 1
+              ? ` ratings`
+              : ` rating`} */}
           </small>
         </div>
         <div className="add">
           <h3 className="price">{location.state.price} $</h3>
-          <button className="button-14" onClick={addToBasket}>Add to Basket</button>
+          <button className="button-14" onClick={addToBasket}>
+            Add to Basket
+          </button>
         </div>
       </div>
     </div>

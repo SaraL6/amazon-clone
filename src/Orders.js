@@ -9,7 +9,7 @@ function Orders() {
   const [{ basket, user }, dispatch] = useStateValue();
   const { orders, setOrders } = useContext(OrdersContext);
   let usersRef = db.collection("users");
-
+  console.log("orders", orders);
   let products = [];
   const newDataRef = useRef(null);
   let orderArr;
@@ -36,12 +36,9 @@ function Orders() {
             return obj;
           }, {});
 
-
           orderArr = Object.values(newData);
           // console.log(orderArr)
-        
 
-        
           setOrders(
             orderArr.map((order) => ({
               ...order,
@@ -54,13 +51,12 @@ function Orders() {
     }
   }, [user]);
 
-  
   return (
     <div className="orders">
       <h1>Your Orders</h1>
       <div className="orders__order">
         {orders?.map((order) => {
-          return <Order order={order} key={order.orderId}/>;
+          return <Order order={order} key={order.orderId} />;
         })}
       </div>
     </div>

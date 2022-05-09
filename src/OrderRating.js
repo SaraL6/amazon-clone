@@ -22,7 +22,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
   const { products, setProducts } = useContext(ProductsContext);
   let ratingsArr = [];
   let orderIds = [];
-  //console.log("checkoutUserRating", productUserRating, "productId", productId);
   let productsArr = [];
   let docRef = db
     .collection("users")
@@ -34,11 +33,24 @@ export default function BasicRating({ orderId, productId, userRating }) {
 
   let productRatings = db.collection("products").doc(`${productId}`);
   useEffect(() => {
+    console.log("orderId", orderId);
+    setProductUserRating(userRating);
+    setValue(productUserRating);
+
     db.collectionGroup("ratings")
       .get()
       .then((snapshot) => {
         snapshot.docs.map((doc) => {
-          if (doc.data().orderId == orderId) {
+          if (
+            doc.data().orderId == orderId &&
+            doc.data().productId == productId
+          ) {
+            console.log(
+              "first",
+              doc.data().rating,
+              "product",
+              doc.data().productId
+            );
             setProductUserRating(doc.data().rating);
             setValue(doc.data().rating);
           }
@@ -49,23 +61,24 @@ export default function BasicRating({ orderId, productId, userRating }) {
   useEffect(() => {
     // console.log("products", products);
     products?.forEach((product) => {
-    //  console.log("product", product);
+      //  console.log("product", product);
       if (product.id == productId) {
-    product.orderIds &&    product?.orderIds.forEach((order, key) => {
-          if (order.orderId == orderId) {
-            //  console.log(order);
-            order.userRating = productUserRating;
-            //  console.log("order", order);
-          }
-        });
-      } else {
-        console.log("error");
+        product.orderIds &&
+          product?.orderIds.forEach((order, key) => {
+            if (order.orderId == orderId) {
+              //  console.log(order);
+              order.userRating = productUserRating;
+              //  console.log("order", order);
+            }
+          });
       }
     });
   }, [products]);
 
   useEffect(() => {
     // console.log("starValue", starValue);
+    console.log("starValue", starValue);
+
     setProductUserRating(userRating);
 
     if (user) {
@@ -111,12 +124,12 @@ export default function BasicRating({ orderId, productId, userRating }) {
                           }
                         });
                         const avg = sum / ratingsArr.length;
-                    
+
                         productRatings
                           .update({
                             averageRating: avg,
                             productId: productId,
-                               orderIds: orderIds,
+                            orderIds: orderIds,
                           })
                           .then(() => {
                             console.log("Document successfully written!");
@@ -153,6 +166,7 @@ export default function BasicRating({ orderId, productId, userRating }) {
 
       setProductUserRating(userRating);
       //  console.log("productUserRating", productUserRating);
+      console.log("userRating", userRating);
     }
   }, [userRating]);
 
@@ -165,7 +179,7 @@ export default function BasicRating({ orderId, productId, userRating }) {
       <Typography component="legend">Rate this product</Typography>
       <Rating
         name="simple-controlled"
-        value={starValue}
+        value={starValue ? starValue : 0}
         precision={0.5}
         onChange={(event, newValue) => {
           setValue(newValue);

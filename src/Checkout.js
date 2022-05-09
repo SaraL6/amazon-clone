@@ -1,16 +1,25 @@
-import React, { useContext } from "react";
+import React, { useContext,useEffect } from "react";
 import "./Checkout.css";
 import CheckoutProduct from "./CheckoutProduct";
 import { useStateValue } from "./StateProvider";
 import Subtotal from "./Subtotal";
 import FlipMove from "react-flip-move";
 import { forwardRef } from "react";
+import { OrdersContext } from "./ordersContext";
 
 function Checkout() {
   const [{ basket, user }, dispatch] = useStateValue();
+  const { orders, setOrders } = useContext(OrdersContext);
 
-
-
+  basket.map((item) => {
+    console.log("basketItem", item);
+  });
+  useEffect(() => {
+   basket.map((order)=>{
+    console.log("order",order)
+   })
+  }, [])
+  
   return (
     <div className="checkout">
       <div className="checkout__left">
@@ -29,7 +38,9 @@ function Checkout() {
               title={item.title}
               image={item.image}
               price={item.price}
+              description={item.description}
               // rating={item.rating}
+              orders={item.orders}
               userRating={item.userRating ? item.userRating : 0}
             />
           ))}

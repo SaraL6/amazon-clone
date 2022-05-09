@@ -14,8 +14,8 @@ export default function BasicRating(props) {
 
   useEffect(() => {
     productRatings.onSnapshot((doc) => {
-      console.log("productId", props);
-      console.log("Current data: ", doc.data());
+      //console.log("productId", props);
+     // console.log("Current data: ", doc.data());
       if (doc.data()?.averageRating) {
         setValue(doc.data()?.averageRating);
       }
