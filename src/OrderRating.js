@@ -33,7 +33,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
 
   let productRatings = db.collection("products").doc(`${productId}`);
   useEffect(() => {
-    console.log("orderId", orderId);
     setProductUserRating(userRating);
     setValue(productUserRating);
 
@@ -45,12 +44,7 @@ export default function BasicRating({ orderId, productId, userRating }) {
             doc.data().orderId == orderId &&
             doc.data().productId == productId
           ) {
-            console.log(
-              "first",
-              doc.data().rating,
-              "product",
-              doc.data().productId
-            );
+          
             setProductUserRating(doc.data().rating);
             setValue(doc.data().rating);
           }
@@ -77,7 +71,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
 
   useEffect(() => {
     // console.log("starValue", starValue);
-    console.log("starValue", starValue);
 
     setProductUserRating(userRating);
 
@@ -166,7 +159,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
 
       setProductUserRating(userRating);
       //  console.log("productUserRating", productUserRating);
-      console.log("userRating", userRating);
     }
   }, [userRating]);
 

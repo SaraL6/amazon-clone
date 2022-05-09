@@ -177,13 +177,11 @@ function Home() {
           averageRatings?.forEach((avgRating) => {
             if (avgRating?.productId == product.id) {
               productsArr[key] = { ...product, ...avgRating };
-              console.log(productsArr[key] );
             }
           });
         });
      
         setProducts(productsArr);
-        console.log(productsArr)
         setunfilteredProducts(productsArr);
         isDone = true;
       }

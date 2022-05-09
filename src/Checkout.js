@@ -11,14 +11,8 @@ function Checkout() {
   const [{ basket, user }, dispatch] = useStateValue();
   const { orders, setOrders } = useContext(OrdersContext);
 
-  basket.map((item) => {
-    console.log("basketItem", item);
-  });
-  useEffect(() => {
-   basket.map((order)=>{
-    console.log("order",order)
-   })
-  }, [])
+
+
   
   return (
     <div className="checkout">
