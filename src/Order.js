@@ -9,11 +9,7 @@ import { Link } from "react-router-dom";
 
 function Order({ order }) {
   const [{ basket, user }, dispatch] = useStateValue();
-useEffect(() => {
-order.products.map((item)=>{
- console.log("item",item)
-})
-}, [])
+
 
   return (
     <div className="order">

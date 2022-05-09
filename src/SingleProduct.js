@@ -30,19 +30,16 @@ function SingleProduct() {
   };
 
   const location = useLocation();
-  console.log(location);
+  console.log(location.state);
   useEffect(() => {
     location.state.orders &&
       location.state.orders.forEach((order) => {
         if (order?.userId === location.state.userId) {
-          console.log("order", order);
 
           order?.products?.forEach((element) => {
             if (element.id == location.state.id) {
-              console.log("element", element);
               setOrderId(order?.orderId);
               setProductUserRating(element?.userRating);
-              console.log("productUserRating", productUserRating);
             }
           });
         } else {
@@ -50,9 +47,6 @@ function SingleProduct() {
         }
       });
   }, []);
-  useEffect(() => {
-    console.log("orderId", orderId);
-  }, [orderId]);
 
   return (
     <div className="singleProduct">
