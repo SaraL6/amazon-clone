@@ -24,7 +24,7 @@ function CheckoutProduct({
   const { productUserRating, setProductUserRating } =
     useContext(UserRatingContext);
   const { orders, setOrders } = useContext(OrdersContext);
-  const [hideRating, setHideRating] = useState(true);
+  const [hideRating, setHideRating] = useState(false);
   let location = useLocation();
 
   const removeFromBasket = () => {
@@ -37,13 +37,17 @@ function CheckoutProduct({
   useEffect(() => {
     // console.log("first", userRating);
     userRating && setProductUserRating(userRating);
-<<<<<<< HEAD
-    if (location.pathname === "/payment" || "/checkout") {
+    console.log("m",
+      location.pathname,
+      location.pathname === ("/payment" || "/checkout")
+    );
+    if (location.pathname === "/payment" || location.pathname === "/checkout") {
       console.log(location.pathname);
+      setHideRating(true);
+    } else if (location.pathname !== "/payment" || "/checkout") {
+      console.log("show");
       setHideRating(false);
     }
-=======
->>>>>>> 472c662a70bca093ff72a295e201ab49b80e811f
   }, []);
 
   return (
@@ -83,7 +87,7 @@ function CheckoutProduct({
           <strong>{price}</strong>{" "}
         </p>
         <div className="checkoutProduct__rating">
-          {hideRating && (
+          {!hideRating && (
             <OrderRating
               userRating={productUserRating}
               orderId={orderId}
