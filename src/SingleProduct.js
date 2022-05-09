@@ -30,6 +30,10 @@ function SingleProduct() {
   };
 
   const location = useLocation();
+<<<<<<< HEAD
+=======
+  console.log(location.state);
+>>>>>>> 472c662a70bca093ff72a295e201ab49b80e811f
   useEffect(() => {
     location.state.orders &&
       location.state.orders.forEach((order) => {

@@ -37,10 +37,13 @@ function CheckoutProduct({
   useEffect(() => {
     // console.log("first", userRating);
     userRating && setProductUserRating(userRating);
+<<<<<<< HEAD
     if (location.pathname === "/payment" || "/checkout") {
       console.log(location.pathname);
       setHideRating(false);
     }
+=======
+>>>>>>> 472c662a70bca093ff72a295e201ab49b80e811f
   }, []);
 
   return (
