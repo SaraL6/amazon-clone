@@ -9,7 +9,6 @@ function Orders() {
   const [{ basket, user }, dispatch] = useStateValue();
   const { orders, setOrders } = useContext(OrdersContext);
   let usersRef = db.collection("users");
-  console.log("orders", orders);
   let products = [];
   const newDataRef = useRef(null);
   let orderArr;

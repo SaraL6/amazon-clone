@@ -37,8 +37,6 @@ function CheckoutProduct({
   useEffect(() => {
     // console.log("first", userRating);
     userRating && setProductUserRating(userRating);
-    console.log("description", description);
-    console.log("basket",basket)
   }, []);
 
   return (
