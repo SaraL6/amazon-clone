@@ -61,25 +61,9 @@ function Home() {
       .get()
       .then((snapshot) => {
         snapshot.docs.map((doc) => {
-          //  console.log("doc", doc.data());
-
           ratings.push(doc.data());
-          //         getAverage(ratingsArr);
         });
-        // let newData = newDataRef.current;
-        // newData = ratings.reduce((obj, item) => {
-        //   if (obj[item.productId]) {
-        //     obj[item.productId].rating.push(item.rating);
-        //   } else {
-        //     item.rating = [item.rating];
-        //     obj[item.productId] = {
-        //       ...item,
-        //     };
-        //   }
-        //   return obj;
-        // }, {});
-        // ratingsArr = Object.values(newData);
-        // console.log("ratings", ratings);
+    
         let result = ratings.reduce(
           (r, { productId, orderId, rating, userId }) => {
             r[productId] = r[productId] || {
@@ -99,18 +83,17 @@ function Home() {
         );
         ratingsArr = Object.values(result);
 
-        //  console.log("result", ratingsArr);
         return getAverage(ratingsArr);
       })
       .catch(function (err) {
-        //   console.log(err.message);
+           console.log(err.message);
       });
   }
   async function getAverage(ratings) {
     await ratings.forEach((rating) => {
       //console.log(rating.productId);
       let r = rating.rating;
-    //   console.log("r", r);
+      //   console.log("r", r);
       let sum = 0;
       let orderIds = [];
       r.forEach(async (element) => {
@@ -129,7 +112,6 @@ function Home() {
         productId: rating.productId,
         orderIds: orderIds,
       });
-
     });
     return averageRatings;
   }
@@ -143,17 +125,13 @@ function Home() {
           .get()
           .then((querySnapshot) => {
             querySnapshot.docs.forEach((doc) => {
-            //  console.log("ratings", doc.data());
+              //  console.log("ratings", doc.data());
             });
           });
       }
     };
     fetchRatings();
   }, [user]);
-
-//   useEffect(() => {
-// console.log("averageR", averageRatings);
-//   }, [averageRatings]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,7 +157,7 @@ function Home() {
             }
           });
         });
-     
+
         setProducts(productsArr);
         setunfilteredProducts(productsArr);
         isDone = true;
@@ -236,7 +214,7 @@ function Home() {
               image={product.image}
               description={product.description}
               rating={product.averageRating ? product.averageRating : 0}
-              orders={product?.orderIds ? product?.orderIds : 0 }
+              productOrders={product?.orderIds ? product?.orderIds : []}
             />
           ))}
         </div>

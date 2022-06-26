@@ -44,7 +44,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
             doc.data().orderId == orderId &&
             doc.data().productId == productId
           ) {
-          
             setProductUserRating(doc.data().rating);
             setValue(doc.data().rating);
           }
@@ -53,16 +52,12 @@ export default function BasicRating({ orderId, productId, userRating }) {
   }, []);
 
   useEffect(() => {
-    // console.log("products", products);
     products?.forEach((product) => {
-      //  console.log("product", product);
       if (product.id == productId) {
         product.orderIds &&
           product?.orderIds.forEach((order, key) => {
             if (order.orderId == orderId) {
-              //  console.log(order);
               order.userRating = productUserRating;
-              //  console.log("order", order);
             }
           });
       }
@@ -70,7 +65,6 @@ export default function BasicRating({ orderId, productId, userRating }) {
   }, [products]);
 
   useEffect(() => {
-    // console.log("starValue", starValue);
 
     setProductUserRating(userRating);
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useContext,useEffect } from "react";
+import { useContext, useEffect } from "react";
 import "./Order.css";
 import moment from "moment";
 import CheckoutProduct from "./CheckoutProduct";
@@ -21,20 +21,19 @@ function Order({ order }) {
       </p>
 
       {order.products.map((item) => (
-  
-          <CheckoutProduct
-            key={item.id}
-            orderId={order.orderId}
-            id={item.id}
-            title={item.title}
-            description={item.description}
-            image={item.image}
-            price={item.price}
-            rating={item.rating}
-            orders={item.orders}
-            userRating={item.userRating ? item.userRating : 0}
-            hideButton
-          />
+        <CheckoutProduct
+          key={item.id}
+          orderId={order.orderId}
+          id={item.id}
+          title={item.title}
+          description={item.description}
+          image={item.image}
+          price={item.price}
+          rating={item.rating}
+          orders={item.orders}
+          userRating={item.userRating ? item.userRating : 0}
+          hideButton
+        />
       ))}
 
       <CurrencyFormat

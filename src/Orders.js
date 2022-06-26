@@ -34,21 +34,20 @@ function Orders() {
             }
             return obj;
           }, {});
-
           orderArr = Object.values(newData);
-          // console.log(orderArr)
 
           setOrders(
             orderArr.map((order) => ({
               ...order,
             }))
           );
-          // console.log("orders", orders);
         });
     } else {
       setOrders([]);
     }
   }, [user]);
+
+ 
 
   return (
     <div className="orders">

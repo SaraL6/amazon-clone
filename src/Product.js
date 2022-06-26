@@ -1,11 +1,37 @@
 import HomeRating from "./HomeRating";
-import React from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import { db } from "./firebase";
+
 import "./Product.css";
 import { useStateValue } from "./StateProvider";
 import { Link } from "react-router-dom";
+import { OrdersContext } from "./ordersContext";
 
-function Product({ id, title, image, price, rating, description, orders }) {
+function Product({
+  id,
+  title,
+  image,
+  price,
+  rating,
+  description,
+  productOrders,
+}) {
   const [{ basket, user }, dispatch] = useStateValue();
+  const { orders, setOrders } = useContext(OrdersContext);
+  let usersRef = db.collection("users");
+  let products = [];
+  const newDataRef = useRef(null);
+
+  useEffect(() => {
+    orders.forEach((order) => {
+      order.products.forEach((product) => {
+        if (product.id === id) {
+          productOrders.push(order);
+        }
+      });
+    });
+  }, [orders]);
+
   const addToBasket = () => {
     // dispatch the item into the
     dispatch({
@@ -17,11 +43,10 @@ function Product({ id, title, image, price, rating, description, orders }) {
         description: description,
         price: price,
         rating: rating,
-        orders: orders,
+        orders: productOrders,
       },
     });
   };
-
   return (
     <div className="product">
       <div className="product__info">
@@ -35,7 +60,7 @@ function Product({ id, title, image, price, rating, description, orders }) {
               price: price,
               rating: rating,
               description: description,
-              orders: orders,
+              orders: productOrders,
               userId: user?.uid,
             },
           }}

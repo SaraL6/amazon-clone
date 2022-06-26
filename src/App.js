@@ -15,6 +15,7 @@ import Orders from "./Orders";
 import { OrdersContext } from "./ordersContext";
 import { UserRatingContext } from "./UserRatingContext";
 import { ProductsContext } from "./ProductsContext";
+import { AverageRatingContext } from "./AverageRatingContext";
 
 const promise = loadStripe(
   "pk_test_51HnqbtEnWfTQeFEgry9VuDuyY9bBY2YK3eYMlQotNyxtrrcrOBcaYAk2PZqdeY0hLkDobuBXDm2CkyIxwHJ8huq100UN0boPq1"
@@ -32,6 +33,7 @@ function App() {
   const [orders, setOrders] = useState([]);
   const [productUserRating, setProductUserRating] = useState();
   const [products, setProducts] = useState([]);
+  const [averageRating, setAverageRating] = useState();
   const [{}, dispatch] = useStateValue();
 
   useEffect(() => {
@@ -65,38 +67,42 @@ function App() {
             value={{ productUserRating, setProductUserRating }}
           >
             <ProductsContext.Provider value={{ products, setProducts }}>
-              <Switch>
-                <Route exact path="/orders">
-                  <Header />
-                  <Orders />
-                </Route>
+              <AverageRatingContext.Provider
+                value={{ averageRating, setAverageRating }}
+              >
+                <Switch>
+                  <Route exact path="/orders">
+                    <Header />
+                    <Orders />
+                  </Route>
 
-                <Route exact path="/login">
-                  <Login />
-                </Route>
+                  <Route exact path="/login">
+                    <Login />
+                  </Route>
 
-                <Route exact path="/checkout">
-                  <Header />
-                  <Checkout />
-                </Route>
+                  <Route exact path="/checkout">
+                    <Header />
+                    <Checkout />
+                  </Route>
 
-                <Route exact path="/payment">
-                  <Header />
-                  <Elements stripe={promise}>
-                    <Payment />
-                  </Elements>
-                </Route>
+                  <Route exact path="/payment">
+                    <Header />
+                    <Elements stripe={promise}>
+                      <Payment />
+                    </Elements>
+                  </Route>
 
-                <Route exact path="/product/:id">
-                  <Header />
-                  <SingleProduct />
-                </Route>
+                  <Route exact path="/product/:id">
+                    <Header />
+                    <SingleProduct />
+                  </Route>
 
-                <Route exact path="/">
-                  <Header />
-                  <Home />
-                </Route>
-              </Switch>
+                  <Route exact path="/">
+                    <Header />
+                    <Home />
+                  </Route>
+                </Switch>
+              </AverageRatingContext.Provider>
             </ProductsContext.Provider>
           </UserRatingContext.Provider>
         </OrdersContext.Provider>
